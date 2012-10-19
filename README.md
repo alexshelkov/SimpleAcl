@@ -1,0 +1,1 @@
+Simple Access Control List (ACL) for PHP.
