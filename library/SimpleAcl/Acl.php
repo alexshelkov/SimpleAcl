@@ -78,4 +78,39 @@ class Acl
 
         return false;
     }
+
+    /**
+     * Remove all rules.
+     *
+     */
+    public function removeAllRules()
+    {
+        $this->rules = array();
+    }
+
+    /**
+     * Remove rules by rule name and (or) role and resource.
+     *
+     * @param null|string $roleName
+     * @param null|string $resourceName
+     * @param null|string $ruleName
+     */
+    public function removeRule($roleName = null, $resourceName = null, $ruleName = null)
+    {
+        if ( is_null($roleName) && is_null($resourceName) && is_null($ruleName) ) {
+            $this->removeAllRules();
+            return;
+        }
+
+        foreach ( $this->rules as $ruleIndex => $rule ) {
+            if ( $ruleName === null || ($ruleName !== null && $ruleName == $rule->getName()) ) {
+                if ( $roleName === null || ($roleName !== null && $rule->getRole() && $rule->getRole()->getName() == $roleName) ) {
+                    if ( $resourceName === null || ($resourceName !== null && $rule->getResource() && $rule->getResource()->getName() == $resourceName) ) {
+                        unset($this->rules[$ruleIndex]);
+                    }
+                }
+            }
+        }
+
+    }
 }

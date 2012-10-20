@@ -372,4 +372,174 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($acl->isAllowed('Moderator', 'Page', 'View'));
         $this->assertTrue($acl->isAllowed('Admin', 'Page', 'View'));
     }
+
+    public function testRemoveAllRules()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $resource = new Resource('Page');
+
+        $acl->addRule($user, $resource, new Rule('View'), true);
+        $acl->addRule($user, $resource, new Rule('Edit'), true);
+        $acl->addRule($user, $resource, new Rule('Remove'), true);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+
+        $acl->removeAllRules();
+
+        $this->assertAttributeCount(0, 'rules', $acl);
+    }
+
+    public function testRemoveRuleActAsRemoveAllRules()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $resource = new Resource('Page');
+
+        $acl->addRule($user, $resource, new Rule('View'), true);
+        $acl->addRule($user, $resource, new Rule('Edit'), true);
+        $acl->addRule($user, $resource, new Rule('Remove'), true);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+
+        $acl->removeRule();
+
+        $this->assertAttributeCount(0, 'rules', $acl);
+    }
+
+    public function testRemoveRuleNotMatch()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $moderator = new Role('Moderator');
+        $admin = new Role('Admin');
+
+        $page = new Resource('Page');
+        $blog = new Resource('Blog');
+        $site = new Resource('Site');
+
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $blog, new Rule('Edit'), true);
+        $acl->addRule($admin, $site, new Rule('Remove'), true);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $acl->removeRule('RoleNotMatch');
+        $this->assertAttributeCount(3, 'rules', $acl);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $acl->removeRule(null, 'ResourceNotMatch');
+        $this->assertAttributeCount(3, 'rules', $acl);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $acl->removeRule(null, 'ResourceNotMatch');
+        $this->assertAttributeCount(3, 'rules', $acl);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $acl->removeRule(null, null, 'RuleNotMatch');
+        $this->assertAttributeCount(3, 'rules', $acl);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $acl->removeRule('RoleNotMatch', 'ResourceNotMatch', 'RuleNotMatch');
+        $this->assertAttributeCount(3, 'rules', $acl);
+    }
+
+    public function testRemoveRule()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $moderator = new Role('Moderator');
+        $admin = new Role('Admin');
+
+        $page = new Resource('Page');
+        $blog = new Resource('Blog');
+        $site = new Resource('Site');
+
+        // Remove rules by Role
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($user, $blog, new Rule('Edit'), true);
+        $acl->addRule($user, $site, new Rule('Remove'), true);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $acl->removeRule('User');
+        $this->assertAttributeCount(0, 'rules', $acl);
+
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($user, $blog, new Rule('Edit'), true);
+        $acl->addRule($moderator, $site, new Rule('Remove'), true);
+
+        $acl->removeRule('User');
+        $this->assertAttributeCount(1, 'rules', $acl);
+
+        $acl->removeRule();
+
+        // Remove rules by Resource
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $page, new Rule('Edit'), true);
+        $acl->addRule($admin, $page, new Rule('Remove'), true);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $acl->removeRule(null, 'Page');
+        $this->assertAttributeCount(0, 'rules', $acl);
+
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $page, new Rule('Edit'), true);
+        $acl->addRule($admin, $blog, new Rule('Remove'), true);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $acl->removeRule(null, 'Page');
+        $this->assertAttributeCount(1, 'rules', $acl);
+
+        $acl->removeRule();
+
+        // Remove rules by Rule
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $blog, new Rule('View'), true);
+        $acl->addRule($admin, $site, new Rule('View'), true);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $acl->removeRule(null, null, 'View');
+        $this->assertAttributeCount(0, 'rules', $acl);
+
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $blog, new Rule('View'), true);
+        $acl->addRule($admin, $site, new Rule('Edit'), true);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $acl->removeRule(null, null, 'View');
+        $this->assertAttributeCount(1, 'rules', $acl);
+
+        $acl->removeRule();
+
+        // Remove rules by Role & Resource & Rule
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $blog, new Rule('Edit'), true);
+        $acl->addRule($admin, $site, new Rule('Remove'), true);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $acl->removeRule('User', 'Page', 'View');
+        $this->assertAttributeCount(2, 'rules', $acl);
+        $acl->removeRule('Moderator', 'Blog', 'Edit');
+        $this->assertAttributeCount(1, 'rules', $acl);
+        $acl->removeRule('Admin', 'Site', 'Remove');
+        $this->assertAttributeCount(0, 'rules', $acl);
+
+        // Remove rules by pairs
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $blog, new Rule('Edit'), true);
+        $acl->addRule($admin, $site, new Rule('Remove'), true);
+
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $acl->removeRule('User', 'Page');
+        $this->assertAttributeCount(2, 'rules', $acl);
+        $acl->removeRule('Moderator', null, 'Edit');
+        $this->assertAttributeCount(1, 'rules', $acl);
+        $acl->removeRule(null, 'Site', 'Remove');
+        $this->assertAttributeCount(0, 'rules', $acl);
+
+        $acl->removeRule();
+    }
 }
