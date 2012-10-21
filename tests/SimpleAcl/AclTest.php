@@ -7,6 +7,7 @@ use SimpleAcl\Acl;
 use SimpleAcl\Role;
 use SimpleAcl\Resource;
 use SimpleAcl\Rule;
+use SimpleAcl\Role\RoleAggregate;
 
 class AclTest extends PHPUnit_Framework_TestCase
 {
@@ -541,5 +542,80 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertAttributeCount(0, 'rules', $acl);
 
         $acl->removeRule();
+    }
+
+    public function testAggregateRoles()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $moderator = new Role('Moderator');
+        $admin = new Role('Admin');
+
+        $page = new Resource('Page');
+        $blog = new Resource('Blog');
+        $site = new Resource('Site');
+
+        $userGroup = new RoleAggregate();
+
+        $userGroup->addRole($user);
+        $userGroup->addRole($moderator);
+        $userGroup->addRole($admin);
+
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $blog, new Rule('Edit'), true);
+        $acl->addRule($admin, $site, new Rule('Remove'), true);
+
+        $this->assertTrue($acl->isAllowed($userGroup, 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed($userGroup, 'Blog', 'Edit'));
+        $this->assertTrue($acl->isAllowed($userGroup, 'Site', 'Remove'));
+    }
+
+    /**
+     * Testing edge conditions.
+     */
+
+    public function testEdgeConditionFirstAddedRuleWins()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+
+        $page = new Resource('Page');
+
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($user, $page, new Rule('View'), false);
+
+        $this->assertAttributeCount(2, 'rules', $acl);
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
+
+        $acl->removeRule(null, null, 'View', false);
+
+        $this->assertAttributeCount(1, 'rules', $acl);
+        $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
+    }
+
+    public function testEdgeConditionAggregateRolesFirstAddedRoleWins()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $moderator = new Role('Moderator');
+
+        $page = new Resource('Page');
+
+        $userGroup = new RoleAggregate();
+
+        $userGroup->addRole($user);
+        $userGroup->addRole($moderator);
+
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $page, new Rule('View'), false);
+
+        $this->assertTrue($acl->isAllowed($userGroup, 'Page', 'View'));
+
+        $userGroup->removeRole('User');
+
+        $this->assertFalse($acl->isAllowed($userGroup, 'Page', 'View'));
     }
 }
