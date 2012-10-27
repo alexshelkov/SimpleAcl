@@ -8,7 +8,7 @@ Add following in your composer.json:
 ```json
 {
     "require": {
-        "alexshekov/simpleacle": "1.*"
+        "alexshelkov/simpleacl": "1.*"
     }
 }
 ```
