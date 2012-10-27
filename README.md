@@ -43,8 +43,8 @@ $siteFrontend = new Resource('SiteFrontend');
 $siteBackend = new Resource('SiteBackend');
 
 $acl->addRule($user, $siteFrontend, new Rule('View'), true);
-$acl->addRule($admin, $siteFrontend, new Rule('View'), true);
-$acl->addRule($admin, $siteBackend, new Rule('View'), true);
+$acl->addRule($admin, $siteFrontend, 'View', true); // you can use string as rule
+$acl->addRule($admin, $siteBackend, 'View', true);
 
 var_dump($acl->isAllowed('User', 'SiteFrontend', 'View')); // true
 var_dump($acl->isAllowed('User', 'SiteBackend', 'View')); // false
@@ -63,8 +63,8 @@ $user->setParent($admin); // add user's parent
 $siteFrontend = new Resource('SiteFrontend');
 $siteBackend = new Resource('SiteBackend');
 
-$acl->addRule($user, $siteFrontend, new Rule('View'), true);
-$acl->addRule($admin, $siteBackend, new Rule('View'), true);
+$acl->addRule($user, $siteFrontend, 'View', true);
+$acl->addRule($admin, $siteBackend, 'View', true);
 
 var_dump($acl->isAllowed('User', 'SiteFrontend', 'View')); // true
 var_dump($acl->isAllowed('User', 'SiteBackend', 'View')); // false
@@ -90,8 +90,8 @@ $all->addRole($admin);
 $siteFrontend = new Resource('SiteFrontend');
 $siteBackend = new Resource('SiteBackend');
 
-$acl->addRule($user, $siteFrontend, new Rule('View'), true);
-$acl->addRule($admin, $siteBackend, new Rule('View'), true);
+$acl->addRule($user, $siteFrontend, 'View', true);
+$acl->addRule($admin, $siteBackend, 'View', true);
 
 var_dump($acl->isAllowed($all, 'SiteFrontend', 'View')); // true
 var_dump($acl->isAllowed($all, 'SiteBackend', 'View')); // true
