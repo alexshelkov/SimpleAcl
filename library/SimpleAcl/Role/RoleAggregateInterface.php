@@ -14,4 +14,6 @@ interface RoleAggregateInterface
     public function removeRoles();
 
     public function removeRole($roleName);
+
+    public function getRoles();
 }
