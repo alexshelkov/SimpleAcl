@@ -545,6 +545,44 @@ class AclTest extends PHPUnit_Framework_TestCase
         $acl->removeRule();
     }
 
+    public function testAggregateBadRolesAndResources()
+    {
+        $acl = new Acl;
+
+       $user = new Role('User');
+
+       $page = new Resource('Page');
+
+       $acl->addRule($user, $page, new Rule('View'), true);
+
+       $this->assertFalse($acl->isAllowed('User', new \stdClass(), 'View'));
+       $this->assertFalse($acl->isAllowed(new \stdClass(), 'Page', 'Edit'));
+    }
+
+    public function testAggregateEmptyRolesAndResources()
+    {
+        $acl = new Acl;
+
+       $user = new Role('User');
+       $moderator = new Role('Moderator');
+       $admin = new Role('Admin');
+
+       $page = new Resource('Page');
+       $blog = new Resource('Blog');
+       $site = new Resource('Site');
+
+       $userGroup = new RoleAggregate();
+       $siteGroup = new ResourceAggregate();
+
+       $acl->addRule($user, $page, new Rule('View'), true);
+       $acl->addRule($moderator, $blog, new Rule('Edit'), true);
+       $acl->addRule($admin, $site, new Rule('Remove'), true);
+
+       $this->assertFalse($acl->isAllowed($userGroup, $siteGroup, 'View'));
+       $this->assertFalse($acl->isAllowed($userGroup, $siteGroup, 'Edit'));
+       $this->assertFalse($acl->isAllowed($userGroup, $siteGroup, 'Remove'));
+    }
+
     public function testAggregateRoles()
     {
         $acl = new Acl;
