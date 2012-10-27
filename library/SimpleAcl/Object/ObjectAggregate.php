@@ -32,12 +32,7 @@ abstract class ObjectAggregate
      */
     protected function removeObject($objectName)
     {
-        foreach ( $this->objects as $objectIndex => $object ) {
-            if ( $object->getName() == $objectName ) {
-                unset($this->objects[$objectIndex]);
-                return;
-            }
-        }
+        unset($this->objects[$objectName]);
     }
 
     /**
