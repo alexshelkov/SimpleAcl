@@ -8,6 +8,7 @@ use SimpleAcl\Role;
 use SimpleAcl\Resource;
 use SimpleAcl\Rule;
 use SimpleAcl\Role\RoleAggregate;
+use SimpleAcl\Resource\ResourceAggregate;
 
 class AclTest extends PHPUnit_Framework_TestCase
 {
@@ -571,6 +572,64 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($acl->isAllowed($userGroup, 'Site', 'Remove'));
     }
 
+    public function testAggregateResources()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $moderator = new Role('Moderator');
+        $admin = new Role('Admin');
+
+        $page = new Resource('Page');
+        $blog = new Resource('Blog');
+        $site = new Resource('Site');
+
+        $siteGroup = new ResourceAggregate();
+
+        $siteGroup->addResource($page);
+        $siteGroup->addResource($blog);
+        $siteGroup->addResource($site);
+
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $blog, new Rule('Edit'), true);
+        $acl->addRule($admin, $site, new Rule('Remove'), true);
+
+        $this->assertTrue($acl->isAllowed('User', $siteGroup, 'View'));
+        $this->assertTrue($acl->isAllowed('Moderator', $siteGroup, 'Edit'));
+        $this->assertTrue($acl->isAllowed('Admin', $siteGroup, 'Remove'));
+    }
+
+    public function testAggregateRolesAndResources()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $moderator = new Role('Moderator');
+        $admin = new Role('Admin');
+
+        $page = new Resource('Page');
+        $blog = new Resource('Blog');
+        $site = new Resource('Site');
+
+        $userGroup = new RoleAggregate();
+        $userGroup->addRole($user);
+        $userGroup->addRole($moderator);
+        $userGroup->addRole($admin);
+
+        $siteGroup = new ResourceAggregate();
+        $siteGroup->addResource($page);
+        $siteGroup->addResource($blog);
+        $siteGroup->addResource($site);
+
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $blog, new Rule('Edit'), true);
+        $acl->addRule($admin, $site, new Rule('Remove'), true);
+
+        $this->assertTrue($acl->isAllowed($userGroup, $siteGroup, 'View'));
+        $this->assertTrue($acl->isAllowed($userGroup, $siteGroup, 'Edit'));
+        $this->assertTrue($acl->isAllowed($userGroup, $siteGroup, 'Remove'));
+    }
+
     /**
      * Testing edge conditions.
      */
@@ -617,5 +676,28 @@ class AclTest extends PHPUnit_Framework_TestCase
         $userGroup->removeRole('User');
 
         $this->assertFalse($acl->isAllowed($userGroup, 'Page', 'View'));
+    }
+
+    public function testEdgeConditionAggregateResourcesFirstAddedResourceWins()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+
+        $page = new Resource('Page');
+        $blog = new Resource('Blog');
+
+        $siteGroup = new ResourceAggregate();
+        $siteGroup->addResource($page);
+        $siteGroup->addResource($blog);
+
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($user, $blog, new Rule('View'), false);
+
+        $this->assertTrue($acl->isAllowed('User', $siteGroup, 'View'));
+
+        $siteGroup->removeResource('Page');
+
+        $this->assertFalse($acl->isAllowed('User', $siteGroup, 'View'));
     }
 }

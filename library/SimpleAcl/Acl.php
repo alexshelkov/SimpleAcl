@@ -6,6 +6,7 @@ use SimpleAcl\Resource;
 use SimpleAcl\Rule;
 
 use SimpleAcl\Role\RoleAggregateInterface;
+use SimpleAcl\Resource\ResourceAggregateInterface;
 
 /**
  * Access Control List (ACL) management.
@@ -60,33 +61,44 @@ class Acl
     }
 
     /**
-     * Check is access allowed for rule.
+     * Get names.
+     *
+     * @param string|RoleAggregateInterface|ResourceAggregateInterface $object
+     * @return array
+     */
+    protected function getNames($object)
+    {
+        if ( is_string($object) ) {
+            return array($object);
+        } elseif ( $object instanceof RoleAggregateInterface ) {
+            return array_keys($object->getRoles());
+        } elseif ( $object instanceof ResourceAggregateInterface ) {
+            return array_keys($object->getResources());
+        }
+
+        return array();
+    }
+
+    /**
+     * Check is access allowed by some rule.
      * Returns null if rule don't match any role or resource.
      *
      * @param string|RoleAggregateInterface $roleName
-     * @param string $resourceName
+     * @param string|ResourceAggregateInterface $resourceName
      * @param Rule $rule
      * @return bool|null
      */
     protected function isRuleAllow($roleName, $resourceName, Rule $rule)
     {
-        $roles = array();
-        if ( is_string($roleName) ) {
-            $roles = array($roleName);
-        } elseif ( $roleName instanceof RoleAggregateInterface ) {
-            $roles = $roleName->getRoles();
-        }
+        $roles = $this->getNames($roleName);
+        $resources = $this->getNames($resourceName);
 
         foreach ( $roles as $role ) {
-            if ( is_string($role) ) {
-                $roleName = $role;
-            } elseif ( $role instanceof Role ) {
-                $roleName = $role->getName();
-            }
-
-            $isAllowed = $rule->isAllowed($roleName, $resourceName);
-            if ( $isAllowed !== null ) {
-                return $isAllowed;
+            foreach ( $resources as $resource ) {
+                $isAllowed = $rule->isAllowed($role, $resource);
+                if ( $isAllowed !== null ) {
+                    return $isAllowed;
+                }
             }
         }
 
@@ -97,7 +109,7 @@ class Acl
      * Checks is access allowed.
      *
      * @param string|RoleAggregateInterface $roleName
-     * @param string $resourceName
+     * @param string|ResourceAggregateInterface $resourceName
      * @param string $ruleName
      * @return bool
      */
