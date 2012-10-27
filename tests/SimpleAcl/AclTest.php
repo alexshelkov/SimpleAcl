@@ -37,6 +37,13 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($acl->isAllowed('NotDefinedRole', 'NotDefinedResource', 'View'));
     }
 
+    public function testThrowsExceptionWhenBadRule()
+    {
+        $acl = new Acl;
+        $this->setExpectedException('SimpleAcl\Exception\InvalidArgumentException', 'SimpleAcl\Rule or string');
+        $acl->addRule(new Role('User'), new Resource('Page'), new \stdClass(), true);
+    }
+
     public function testOneRoleOneResourceOneRule()
     {
         $acl = new Acl;
@@ -666,6 +673,35 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($acl->isAllowed($userGroup, $siteGroup, 'View'));
         $this->assertTrue($acl->isAllowed($userGroup, $siteGroup, 'Edit'));
         $this->assertTrue($acl->isAllowed($userGroup, $siteGroup, 'Remove'));
+    }
+
+    public function testStringAsRule()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $resource = new Resource('Page');
+
+        $acl->addRule($user, $resource, 'View', true);
+        $acl->addRule($user, $resource, 'Edit', true);
+        $acl->addRule($user, $resource, 'Remove', true);
+
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'Edit'));
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'Remove'));
+
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $resource = new Resource('Page');
+
+        $acl->addRule($user, $resource, 'View', false);
+        $acl->addRule($user, $resource, 'Edit', false);
+        $acl->addRule($user, $resource, 'Remove', false);
+
+        $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
+        $this->assertFalse($acl->isAllowed('User', 'Page', 'Edit'));
+        $this->assertFalse($acl->isAllowed('User', 'Page', 'Remove'));
     }
 
     /**

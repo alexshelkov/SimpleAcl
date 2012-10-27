@@ -7,6 +7,7 @@ use SimpleAcl\Rule;
 
 use SimpleAcl\Role\RoleAggregateInterface;
 use SimpleAcl\Resource\ResourceAggregateInterface;
+use SimpleAcl\Exception\InvalidArgumentException;
 
 /**
  * Access Control List (ACL) management.
@@ -46,11 +47,19 @@ class Acl
      *
      * @param Role $role
      * @param Resource $resource
-     * @param Rule $rule
+     * @param Rule|string $rule
      * @param mixed $action
      */
-    public function addRule(Role $role, Resource $resource, Rule $rule, $action)
+    public function addRule(Role $role, Resource $resource, $rule, $action)
     {
+        if ( is_string($rule) ) {
+            $rule = new Rule($rule);
+        }
+
+        if ( ! $rule instanceof Rule ) {
+            throw new InvalidArgumentException('Rule must be an instance of SimpleAcl\Rule or string');
+        }
+
         $rule->setRole($role);
         $rule->setResource($resource);
         $rule->setAction($action);
