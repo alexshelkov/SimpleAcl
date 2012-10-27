@@ -23,6 +23,33 @@ class Acl
     protected $rules = array();
 
     /**
+     * Class name used when rule created from string.
+     *
+     * @var string
+     */
+    protected $ruleClass = 'SimpleAcl\Rule';
+
+    /**
+     * Set rule class.
+     *
+     * @param string $ruleClass
+     */
+    public function setRuleClass($ruleClass)
+    {
+        $this->ruleClass = $ruleClass;
+    }
+
+    /**
+     * Return rule class.
+     *
+     * @return string
+     */
+    public function getRuleClass()
+    {
+        return $this->ruleClass;
+    }
+
+    /**
      * Return true if rule was already added.
      *
      * @param Rule $needRule
@@ -53,7 +80,11 @@ class Acl
     public function addRule(Role $role, Resource $resource, $rule, $action)
     {
         if ( is_string($rule) ) {
-            $rule = new Rule($rule);
+            $ruleClass = $this->getRuleClass();
+            $ruleName = $rule;
+            $rule = new $ruleClass();
+            /** @var Rule $rule */
+            $rule->setName($ruleName);
         }
 
         if ( ! $rule instanceof Rule ) {

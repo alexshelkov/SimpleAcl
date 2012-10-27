@@ -39,7 +39,7 @@ class Rule
      *
      * @param $name
      */
-    public function __construct($name)
+    public function __construct($name = null)
     {
         $this->setName($name);
     }

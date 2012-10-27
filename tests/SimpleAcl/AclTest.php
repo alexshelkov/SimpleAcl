@@ -692,6 +692,8 @@ class AclTest extends PHPUnit_Framework_TestCase
 
         $acl = new Acl;
 
+        $acl->setRuleClass('SimpleAcl\Rule');
+
         $user = new Role('User');
         $resource = new Resource('Page');
 
@@ -703,6 +705,7 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($acl->isAllowed('User', 'Page', 'Edit'));
         $this->assertFalse($acl->isAllowed('User', 'Page', 'Remove'));
     }
+
 
     /**
      * Testing edge conditions.
