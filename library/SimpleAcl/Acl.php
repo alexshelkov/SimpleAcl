@@ -76,6 +76,7 @@ class Acl
      * @param Resource $resource
      * @param Rule|string $rule
      * @param mixed $action
+     * @throws InvalidArgumentException
      */
     public function addRule(Role $role, Resource $resource, $rule, $action)
     {
@@ -111,9 +112,9 @@ class Acl
         if ( is_string($object) ) {
             return array($object);
         } elseif ( $object instanceof RoleAggregateInterface ) {
-            return array_keys($object->getRoles());
+            return $object->getRolesNames();
         } elseif ( $object instanceof ResourceAggregateInterface ) {
-            return array_keys($object->getResources());
+            return $object->getResourcesNames();
         }
 
         return array();

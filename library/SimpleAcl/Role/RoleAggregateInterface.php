@@ -5,15 +5,10 @@ use SimpleAcl\Role;
 
 interface RoleAggregateInterface
 {
-    public function getRole($roleName);
-
-    public function addRole(Role $role);
-
-    public function setRoles($roles);
-
-    public function removeRoles();
-
-    public function removeRole($roleName);
-
-    public function getRoles();
+    /**
+     * Return array of names for registered roles.
+     *
+     * @return array
+     */
+    public function getRolesNames();
 }

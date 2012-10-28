@@ -63,6 +63,16 @@ class ResourceAggregate extends ObjectAggregate implements ResourceAggregateInte
     }
 
     /**
+     * Return array of names for registered resources.
+     *
+     * @return array
+     */
+    public function getResourcesNames()
+    {
+        return array_keys($this->getResources());
+    }
+
+    /**
      * Return resource by name.
      *
      * @param $resourceName
