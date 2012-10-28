@@ -63,6 +63,16 @@ class RoleAggregate extends ObjectAggregate implements RoleAggregateInterface
     }
 
     /**
+     * Return array of names for registered roles.
+     *
+     * @return array
+     */
+    public function getRolesNames()
+    {
+        return array_keys($this->getRoles());
+    }
+
+    /**
      * Return role by name.
      *
      * @param $roleName

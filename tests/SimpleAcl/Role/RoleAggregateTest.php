@@ -41,6 +41,23 @@ class RoleAggregateTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(array('One' => $role1, 'Tow' => $role2), $user->getRoles());
     }
 
+    public function testGetRolesNames()
+    {
+        $user = new RoleAggregate();
+
+        $role1 = new Role('One');
+        $role2 = new Role('Tow');
+
+        $this->assertEquals(0, count($user->getRoles()));
+
+        $user->addRole($role1);
+        $user->addRole($role2);
+
+        $this->assertEquals(2, count($user->getRoles()));
+
+        $this->assertSame(array('One',  'Tow'), $user->getRolesNames());
+    }
+
     public function testRemoveRoles()
     {
         $user = new RoleAggregate();
