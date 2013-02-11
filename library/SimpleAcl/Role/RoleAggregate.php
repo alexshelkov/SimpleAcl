@@ -69,7 +69,7 @@ class RoleAggregate extends ObjectAggregate implements RoleAggregateInterface
      */
     public function getRolesNames()
     {
-        return array_keys($this->getRoles());
+        return parent::getObjectNames();
     }
 
     /**

@@ -69,7 +69,7 @@ class ResourceAggregate extends ObjectAggregate implements ResourceAggregateInte
      */
     public function getResourcesNames()
     {
-        return array_keys($this->getResources());
+        return parent::getObjectNames();
     }
 
     /**

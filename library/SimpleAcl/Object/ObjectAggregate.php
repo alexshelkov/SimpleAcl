@@ -19,7 +19,8 @@ abstract class ObjectAggregate
      */
     protected function addObject(Object $object)
     {
-        $this->objects[$object->getName()] = $object;
+        $this->removeObject($object->getName());
+        $this->objects[] = $object;
     }
 
     protected function removeObjects()
@@ -29,10 +30,19 @@ abstract class ObjectAggregate
 
     /**
      * @param string $objectName
+     *
+     * @return bool
      */
     protected function removeObject($objectName)
     {
-        unset($this->objects[$objectName]);
+        foreach ($this->objects as $objectIndex => $object) {
+            if ( $object->getName() == $objectName ) {
+                unset($this->objects[$objectIndex]);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -40,7 +50,7 @@ abstract class ObjectAggregate
      */
     protected function setObjects($objects)
     {
-        /** @var Object $object  */
+        /** @var Object $object */
         foreach ($objects as $object) {
             $this->addObject($object);
         }
@@ -56,14 +66,32 @@ abstract class ObjectAggregate
 
     /**
      * @param string $objectName
+     *
      * @return null|Object
      */
     protected function getObject($objectName)
     {
-        if ( isset($this->objects[$objectName]) ) {
-            return $this->objects[$objectName];
+        foreach ($this->objects as $object) {
+            if ( $object->getName() == $objectName ) {
+                return $object;
+            }
         }
 
         return null;
     }
+
+    /**
+     * @return array
+     */
+    protected function getObjectNames()
+    {
+        $names = array();
+
+        foreach ($this->objects as $object) {
+            $names[] = $object->getName();
+        }
+
+        return $names;
+    }
+
 }

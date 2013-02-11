@@ -11,7 +11,7 @@ class RoleAggregateTest extends PHPUnit_Framework_TestCase
 {
     public function testSetAndGetRoles()
     {
-        $roles = array('One' => new Role('One'), 'Tow' => new Role('Tow'));
+        $roles = array(new Role('One'), new Role('Tow'));
 
         $user = new RoleAggregate();
 
@@ -38,7 +38,7 @@ class RoleAggregateTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(2, count($user->getRoles()));
 
-        $this->assertEquals(array('One' => $role1, 'Tow' => $role2), $user->getRoles());
+        $this->assertEquals(array($role1, $role2), $user->getRoles());
     }
 
     public function testGetRolesNames()
@@ -105,7 +105,7 @@ class RoleAggregateTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, count($user->getRoles()));
     }
 
-    public function testAddObjectWithSameName()
+    public function testAddRoleWithSameName()
     {
         $user = new RoleAggregate();
 

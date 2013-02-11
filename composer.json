@@ -2,7 +2,7 @@
     "name": "alexshelkov/simpleacl",
     "type": "library",
     "description": "Simple Access Control List (ACL) for PHP.",
-    "keywords": ["ACL"],
+    "keywords": ["ACL", "authorization", "permission"],
     "homepage": "https://github.com/alexshelkov/SimpleAcl",
     "authors": [
         {

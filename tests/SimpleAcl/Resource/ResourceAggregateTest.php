@@ -11,7 +11,7 @@ class ResourceAggregateTest extends PHPUnit_Framework_TestCase
 {
     public function testSetAndGetResources()
     {
-        $resources = array('One' => new Resource('One'), 'Tow' => new Resource('Tow'));
+        $resources = array(new Resource('One'),new Resource('Tow'));
 
         $site = new ResourceAggregate();
 
@@ -38,7 +38,7 @@ class ResourceAggregateTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(2, count($site->getResources()));
 
-        $this->assertEquals(array('One' => $resource1, 'Tow' => $resource2), $site->getResources());
+        $this->assertEquals(array($resource1, $resource2), $site->getResources());
     }
 
     public function testGetResourcesNames()
@@ -105,7 +105,7 @@ class ResourceAggregateTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, count($site->getResources()));
     }
 
-    public function testAddObjectWithSameName()
+    public function testAddResourcectWithSameName()
     {
         $site = new ResourceAggregate();
 
