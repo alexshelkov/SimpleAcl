@@ -28,9 +28,15 @@ class RoleAndResourceTest extends PHPUnit_Framework_TestCase
         $role->setParent($parentRole);
         $this->assertSame($role->getParent(), $parentRole);
 
+        $role->setParent();
+        $this->assertNull($role->getParent());
+
         $resource = new Resource('Resource');
         $parentResource = new Resource('ParentResource');
         $resource->setParent($parentResource);
         $this->assertSame($resource->getParent(), $parentResource);
+
+        $resource->setParent();
+        $this->assertNull($resource->getParent());
     }
 }

@@ -49,9 +49,9 @@ abstract class Object
     }
 
     /**
-     * @param Object $parent
+     * @param Object $parent | null
      */
-    public function setParent(Object $parent)
+    public function setParent(Object $parent = null)
     {
         $this->parent = $parent;
     }
