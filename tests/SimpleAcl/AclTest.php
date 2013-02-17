@@ -711,7 +711,7 @@ class AclTest extends PHPUnit_Framework_TestCase
      * Testing edge conditions.
      */
 
-    public function testEdgeConditionFirstAddedRuleWins()
+    public function testEdgeConditionLastAddedRuleWins()
     {
         $acl = new Acl;
 
@@ -719,8 +719,8 @@ class AclTest extends PHPUnit_Framework_TestCase
 
         $page = new Resource('Page');
 
-        $acl->addRule($user, $page, new Rule('View'), true);
         $acl->addRule($user, $page, new Rule('View'), false);
+        $acl->addRule($user, $page, new Rule('View'), true);
 
         $this->assertAttributeCount(2, 'rules', $acl);
         $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
@@ -728,6 +728,15 @@ class AclTest extends PHPUnit_Framework_TestCase
         $acl->removeRule(null, null, 'View', false);
 
         $this->assertAttributeCount(1, 'rules', $acl);
+        $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
+
+        $acl->addRule($user, $page, new Rule('View'), true);
+
+        $this->assertAttributeCount(2, 'rules', $acl);
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
+
+        $acl->addRule($user, $page, new Rule('View'), false);
+        $this->assertAttributeCount(3, 'rules', $acl);
         $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
     }
 
@@ -745,8 +754,8 @@ class AclTest extends PHPUnit_Framework_TestCase
         $userGroup->addRole($user);
         $userGroup->addRole($moderator);
 
-        $acl->addRule($user, $page, new Rule('View'), true);
         $acl->addRule($moderator, $page, new Rule('View'), false);
+        $acl->addRule($user, $page, new Rule('View'), true);
 
         $this->assertTrue($acl->isAllowed($userGroup, 'Page', 'View'));
 
@@ -768,8 +777,8 @@ class AclTest extends PHPUnit_Framework_TestCase
         $siteGroup->addResource($page);
         $siteGroup->addResource($blog);
 
-        $acl->addRule($user, $page, new Rule('View'), true);
         $acl->addRule($user, $blog, new Rule('View'), false);
+        $acl->addRule($user, $page, new Rule('View'), true);
 
         $this->assertTrue($acl->isAllowed('User', $siteGroup, 'View'));
 

@@ -97,8 +97,18 @@ class Acl
         $rule->setAction($action);
 
         if ( ! $this->hasRule($rule) ) {
-            $this->rules[] = $rule;
+            $this->unShiftRule($rule);
         }
+    }
+
+    /**
+     * Add rule at the top of rules array.
+     *
+     * @param $rule
+     */
+    protected function unShiftRule($rule)
+    {
+        array_unshift($this->rules, $rule);
     }
 
     /**
