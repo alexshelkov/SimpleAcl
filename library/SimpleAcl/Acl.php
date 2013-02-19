@@ -8,6 +8,7 @@ use SimpleAcl\Rule;
 use SimpleAcl\Role\RoleAggregateInterface;
 use SimpleAcl\Resource\ResourceAggregateInterface;
 use SimpleAcl\Exception\InvalidArgumentException;
+use SimpleAcl\RuleResultCollection;
 
 /**
  * Access Control List (ACL) management.
@@ -97,6 +98,7 @@ class Acl
         $rule->setAction($action);
 
         if ( ! $this->hasRule($rule) ) {
+//            $this->rules[] = $rule;
             $this->unShiftRule($rule);
         }
     }
@@ -137,23 +139,19 @@ class Acl
      * @param string|RoleAggregateInterface $roleName
      * @param string|ResourceAggregateInterface $resourceName
      * @param Rule $rule
-     * @return bool|null
+     * @param RuleResultCollection $resultCollection
      */
-    protected function isRuleAllow($roleName, $resourceName, Rule $rule)
+    protected function isRuleAllow($roleName, $resourceName, Rule $rule, RuleResultCollection $ruleResultCollection)
     {
         $roles = $this->getNames($roleName);
         $resources = $this->getNames($resourceName);
 
         foreach ( $roles as $role ) {
             foreach ( $resources as $resource ) {
-                $isAllowed = $rule->isAllowed($role, $resource);
-                if ( $isAllowed !== null ) {
-                    return $isAllowed;
-                }
+                $result = $rule->isAllowed($role, $resource);
+                $ruleResultCollection->add($result);
             }
         }
-
-        return null;
     }
 
     /**
@@ -166,16 +164,29 @@ class Acl
      */
     public function isAllowed($roleName, $resourceName, $ruleName)
     {
-        foreach ( $this->rules as $rule ) {
+        return $this->isAllowedReturnResult($roleName, $resourceName, $ruleName)->get();
+    }
+
+    /**
+     * Checks is access allowed.
+     *
+     * @param string|RoleAggregateInterface $roleName
+     * @param string|ResourceAggregateInterface $resourceName
+     * @param string $ruleName
+     *
+     * @return RuleResultCollection
+     */
+    public function isAllowedReturnResult($roleName, $resourceName, $ruleName)
+    {
+        $ruleResultCollection = new RuleResultCollection();
+
+        foreach ($this->rules as $rule) {
             if ( $rule->getName() == $ruleName ) {
-                $isAllowed = $this->isRuleAllow($roleName, $resourceName, $rule);
-                if ( $isAllowed !== null ) {
-                    return $isAllowed;
-                }
+                $this->isRuleAllow($roleName, $resourceName, $rule, $ruleResultCollection);
             }
         }
 
-        return false;
+        return $ruleResultCollection;
     }
 
     /**

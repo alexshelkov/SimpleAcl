@@ -8,7 +8,7 @@ Add following in your composer.json:
 ```json
 {
     "require": {
-        "alexshelkov/simpleacl": "1.*"
+        "alexshelkov/simpleacl": "2.*"
     }
 }
 ```
@@ -28,7 +28,7 @@ $view->setRole(new Role('User'));
 $view->setResource(new Resource('Page'));
 $view->setAction(true); // true means that we allow access
 
-var_dump($view->isAllowed('User', 'Page')); // true
+var_dump((bool)$view->isAllowed('User', 'Page')); // true
 ```
 
 ###### Add rules
@@ -51,14 +51,14 @@ var_dump($acl->isAllowed('User', 'SiteBackend', 'View')); // false
 var_dump($acl->isAllowed('Admin', 'SiteFrontend', 'View')); // true
 var_dump($acl->isAllowed('Admin', 'SiteBackend', 'View')); // true
 ```
-###### Roles inheritance
+###### Roles and resource inheritance
 As you maybe notice in previous example we have some duplication of code, because both "User" and "Admin" was allowed to "View" "SiteFrontend" we added 2 rules. But it is possible to avoid this using roles inheritance.
 ```php
 $acl = new Acl();
 
 $user = new Role('User');
 $admin = new Role('Admin');
-$user->setParent($admin); // add user's parent
+$user->addChild($admin); // add user's child
 
 $siteFrontend = new Resource('SiteFrontend');
 $siteBackend = new Resource('SiteBackend');

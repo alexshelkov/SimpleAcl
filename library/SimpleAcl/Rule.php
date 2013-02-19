@@ -3,6 +3,7 @@ namespace SimpleAcl;
 
 use SimpleAcl\Resource;
 use SimpleAcl\Role;
+use SimpleAcl\RuleResult;
 
 /**
  * Used to connects Role and Resources together.
@@ -77,30 +78,32 @@ class Rule
     }
 
     /**
-     * Used for recursively walk by Role & Resource parents.
+     * Used for recursively walk by Role & Resource children.
      *
      * @param Role $role
      * @param Resource $resource
      * @param string $needRoleName
      * @param string $needResourceName
-     * @return bool|null
+     * @param $priority
+     *
+     * @return RuleResult|null
      */
-    protected function isAllowedRecursive(Role $role, Resource $resource, $needRoleName, $needResourceName)
+    protected function isAllowedRecursive(Role $role, Resource $resource, $needRoleName, $needResourceName, $priority)
     {
         if ( $role->getName() == $needRoleName && $resource->getName() == $needResourceName ) {
-            return $this->getAction() === true;
+            return new RuleResult($this, $priority);
         }
 
-        if ( $parent = $role->getParent() ) {
-            $isAllowed = $this->isAllowedRecursive($parent, $resource, $needRoleName, $needResourceName);
-            if ( $isAllowed !== null) {
+        foreach ( $role->getChildren() as $child ) {
+            $isAllowed = $this->isAllowedRecursive($child, $resource, $needRoleName, $needResourceName, $priority - 1);
+            if ( $isAllowed !== null ) {
                 return $isAllowed;
             }
         }
 
-        if ( $parent = $resource->getParent() ) {
-            $isAllowed = $this->isAllowedRecursive($role, $parent, $needRoleName, $needResourceName);
-            if ( $isAllowed !== null) {
+        foreach ( $resource->getChildren() as $child ) {
+            $isAllowed = $this->isAllowedRecursive($role, $child, $needRoleName, $needResourceName, $priority - 1);
+            if ( $isAllowed !== null ) {
                 return $isAllowed;
             }
         }
@@ -109,17 +112,17 @@ class Rule
     }
 
     /**
-     * Check owing Role & Resource (and their parents) and match its with $roleName & $resourceName;
+     * Check owing Role & Resource (and their children) and match its with $roleName & $resourceName;
      * if match was found depending on action allow or deny access to $resourceName for $roleName.
      *
      * @param string $roleName
      * @param string $resourceName
-     * @return bool|null null is returned if there is no matched Role & Resource in this rule.
-     *                   boll otherwise.
+     * @return RuleResult|null null is returned if there is no matched Role & Resource in this rule.
+     *                         RuleResult otherwise.
      */
     public function isAllowed($roleName, $resourceName)
     {
-        return $this->isAllowedRecursive($this->getRole(), $this->getResource(), $roleName, $resourceName);
+        return $this->isAllowedRecursive($this->getRole(), $this->getResource(), $roleName, $resourceName, 0);
     }
 
     /**

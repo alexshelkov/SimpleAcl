@@ -15,12 +15,11 @@ abstract class Object
     protected $name;
 
     /**
-     * Holds, if exist parent Object.
-     * By default parent objects granted access of their children.
+     * Holds children.
      *
-     * @var Object
+     * @var Object[]
      */
-    protected $parent;
+    protected $children = array();
 
     /**
      * Create Object with given name.
@@ -49,18 +48,61 @@ abstract class Object
     }
 
     /**
-     * @param Object $parent | null
+     * Adds child if it not added.
+     *
+     * @param Object $child
      */
-    public function setParent(Object $parent = null)
+    public function addChild(Object $child)
     {
-        $this->parent = $parent;
+        if ( $this->hasChild($child) ) {
+            return;
+        }
+        $this->children[] = $child;
     }
 
     /**
-     * @return Object
+     * Remove child, return true if child was removed.
+     *
+     * @param Object $needChild
+     *
+     * @return bool
      */
-    public function getParent()
+    public function removeChild(Object $needChild)
     {
-        return $this->parent;
+        foreach ($this->children as $childIndex => $haveChild) {
+            if ( $haveChild === $needChild ) {
+                unset($this->children[$childIndex]);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if object have child.
+     *
+     * @param Object $needChild
+     *
+     * @return null|Object
+     */
+    public function hasChild(Object $needChild)
+    {
+        foreach ( $this->children as $haveChild ) {
+            if ( $haveChild === $needChild ) {
+                return $needChild;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns children.
+     *
+     * @return Object[]
+     */
+    public function getChildren()
+    {
+        return $this->children;
     }
 }

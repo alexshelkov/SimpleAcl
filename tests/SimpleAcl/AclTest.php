@@ -226,22 +226,30 @@ class AclTest extends PHPUnit_Framework_TestCase
         $moderator = new Role('Moderator');
         $admin = new Role('Admin');
 
-        $user->setParent($moderator);
-        $moderator->setParent($admin);
+        $admin->addChild($moderator);
+        $moderator->addChild($user);
 
         $page = new Resource('Page');
 
-        // Parent elements must grant access
+        // Parent elements must NOT grant access
         $acl->addRule($user, $page, new Rule('View'), true);
+
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
+        $this->assertFalse($acl->isAllowed('Moderator', 'Page', 'View'));
+        $this->assertFalse($acl->isAllowed('Admin', 'Page', 'View'));
+
+        $acl = new Acl;
+
+        // Child elements must inherit access
+        $acl->addRule($admin, $page, new Rule('View'), true);
 
         $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
         $this->assertTrue($acl->isAllowed('Moderator', 'Page', 'View'));
         $this->assertTrue($acl->isAllowed('Admin', 'Page', 'View'));
 
-        $acl = new Acl;
-
-        // Child elements must NOT have access
-        $acl->addRule($admin, $page, new Rule('View'), true);
+        // but last added rules wins
+        $acl->addRule($user, $page, new Rule('View'), false);
+        $acl->addRule($moderator, $page, new Rule('View'), false);
 
         $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
         $this->assertFalse($acl->isAllowed('Moderator', 'Page', 'View'));
@@ -258,20 +266,28 @@ class AclTest extends PHPUnit_Framework_TestCase
         $blog = new Resource('Blog');
         $site = new Resource('Site');
 
-        $page->setParent($blog);
-        $blog->setParent($site);
+        $site->addChild($blog);
+        $blog->addChild($page);
 
-        // Parent elements must grant access
+        // Parent elements must NOT have access
         $acl->addRule($user, $page, new Rule('View'), true);
+
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
+        $this->assertFalse($acl->isAllowed('User', 'Blog', 'View'));
+        $this->assertFalse($acl->isAllowed('User', 'Site', 'View'));
+
+        $acl = new Acl;
+
+        // Child elements must inherit access
+        $acl->addRule($user, $site, new Rule('View'), true);
 
         $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
         $this->assertTrue($acl->isAllowed('User', 'Blog', 'View'));
         $this->assertTrue($acl->isAllowed('User', 'Site', 'View'));
 
-        $acl = new Acl;
-
-        // Child elements must NOT have access
-        $acl->addRule($user, $site, new Rule('View'), true);
+        // but last added rules wins
+        $acl->addRule($user, $page, new Rule('View'), false);
+        $acl->addRule($user, $blog, new Rule('View'), false);
 
         $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
         $this->assertFalse($acl->isAllowed('User', 'Blog', 'View'));
@@ -284,47 +300,45 @@ class AclTest extends PHPUnit_Framework_TestCase
         $moderator = new Role('Moderator');
         $admin = new Role('Admin');
 
-        $user->setParent($moderator);
-        $moderator->setParent($admin);
+        $admin->addChild($moderator);
+        $moderator->addChild($user);
 
         $page = new Resource('Page');
         $blog = new Resource('Blog');
         $site = new Resource('Site');
 
-        $page->setParent($blog);
-        $blog->setParent($site);
+        $site->addChild($blog);
+        $blog->addChild($page);
 
         $acl = new Acl;
 
         $acl->addRule($user, $page, new Rule('View'), true);
 
-        // Parent elements must grant access
         $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
-        $this->assertTrue($acl->isAllowed('Moderator', 'Page', 'View'));
-        $this->assertTrue($acl->isAllowed('Admin', 'Page', 'View'));
+        $this->assertFalse($acl->isAllowed('Moderator', 'Page', 'View'));
+        $this->assertFalse($acl->isAllowed('Admin', 'Page', 'View'));
 
-        $this->assertTrue($acl->isAllowed('User', 'Blog', 'View'));
-        $this->assertTrue($acl->isAllowed('Moderator', 'Blog', 'View'));
-        $this->assertTrue($acl->isAllowed('Admin', 'Blog', 'View'));
+        $this->assertFalse($acl->isAllowed('User', 'Blog', 'View'));
+        $this->assertFalse($acl->isAllowed('Moderator', 'Blog', 'View'));
+        $this->assertFalse($acl->isAllowed('Admin', 'Blog', 'View'));
 
-        $this->assertTrue($acl->isAllowed('User', 'Site', 'View'));
-        $this->assertTrue($acl->isAllowed('Moderator', 'Site', 'View'));
-        $this->assertTrue($acl->isAllowed('Admin', 'Site', 'View'));
+        $this->assertFalse($acl->isAllowed('User', 'Site', 'View'));
+        $this->assertFalse($acl->isAllowed('Moderator', 'Site', 'View'));
+        $this->assertFalse($acl->isAllowed('Admin', 'Site', 'View'));
 
         $acl = new Acl;
 
         $acl->addRule($admin, $page, new Rule('View'), true);
 
-        // Admin must have access to all page parents resources, but not admin children's
         $this->assertTrue($acl->isAllowed('Admin', 'Page', 'View'));
-        $this->assertTrue($acl->isAllowed('Admin', 'Blog', 'View'));
-        $this->assertTrue($acl->isAllowed('Admin', 'Site', 'View'));
+        $this->assertFalse($acl->isAllowed('Admin', 'Blog', 'View'));
+        $this->assertFalse($acl->isAllowed('Admin', 'Site', 'View'));
 
-        $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
         $this->assertFalse($acl->isAllowed('User', 'Blog', 'View'));
         $this->assertFalse($acl->isAllowed('User', 'Site', 'View'));
 
-        $this->assertFalse($acl->isAllowed('Moderator', 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed('Moderator', 'Page', 'View'));
         $this->assertFalse($acl->isAllowed('Moderator', 'Blog', 'View'));
         $this->assertFalse($acl->isAllowed('Moderator', 'Site', 'View'));
 
@@ -332,54 +346,51 @@ class AclTest extends PHPUnit_Framework_TestCase
 
         $acl->addRule($user, $site, new Rule('View'), true);
 
-        // All users must have access to site, but not children's of site
         $this->assertTrue($acl->isAllowed('User', 'Site', 'View'));
-        $this->assertTrue($acl->isAllowed('Moderator', 'Site', 'View'));
-        $this->assertTrue($acl->isAllowed('Admin', 'Site', 'View'));
+        $this->assertFalse($acl->isAllowed('Moderator', 'Site', 'View'));
+        $this->assertFalse($acl->isAllowed('Admin', 'Site', 'View'));
 
-        $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
         $this->assertFalse($acl->isAllowed('Moderator', 'Page', 'View'));
         $this->assertFalse($acl->isAllowed('Admin', 'Page', 'View'));
 
-        $this->assertFalse($acl->isAllowed('User', 'Blog', 'View'));
+        $this->assertTrue($acl->isAllowed('User', 'Blog', 'View'));
         $this->assertFalse($acl->isAllowed('Moderator', 'Blog', 'View'));
         $this->assertFalse($acl->isAllowed('Admin', 'Blog', 'View'));
-    }
 
-    public function testParentRolesAndResourcesWithMultipleRules()
-    {
-        $user = new Role('User');
-        $moderator = new Role('Moderator');
-        $admin = new Role('Admin');
-
-        $user->setParent($moderator);
-        $moderator->setParent($admin);
-
-        $page = new Resource('Page');
-        $blog = new Resource('Blog');
-        $site = new Resource('Site');
-
-        $page->setParent($blog);
-        $blog->setParent($site);
-
+        // test add rule in the middle
         $acl = new Acl;
 
-        $acl->addRule($user, $blog, new Rule('View'), true);
-        $acl->addRule($moderator, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $blog, new Rule('View'), true);
 
-        // User and it parent's must have access to blog and site, but not page
-        // Admin and moderator must have access to page
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
         $this->assertTrue($acl->isAllowed('User', 'Blog', 'View'));
-        $this->assertTrue($acl->isAllowed('Moderator', 'Blog', 'View'));
-        $this->assertTrue($acl->isAllowed('Admin', 'Blog', 'View'));
+        $this->assertFalse($acl->isAllowed('User', 'Site', 'View'));
 
+        $this->assertTrue($acl->isAllowed('Moderator', 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed('Moderator', 'Blog', 'View'));
+        $this->assertFalse($acl->isAllowed('Moderator', 'Site', 'View'));
+
+        $this->assertFalse($acl->isAllowed('Admin', 'Page', 'View'));
+        $this->assertFalse($acl->isAllowed('Admin', 'Blog', 'View'));
+        $this->assertFalse($acl->isAllowed('Admin', 'Site', 'View'));
+
+        // test add rule on the top
+        $acl = new Acl;
+
+        $acl->addRule($admin, $site, new Rule('View'), true);
+
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed('User', 'Blog', 'View'));
         $this->assertTrue($acl->isAllowed('User', 'Site', 'View'));
-        $this->assertTrue($acl->isAllowed('Moderator', 'Site', 'View'));
+
+        $this->assertTrue($acl->isAllowed('Admin', 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed('Admin', 'Blog', 'View'));
         $this->assertTrue($acl->isAllowed('Admin', 'Site', 'View'));
 
-        $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
         $this->assertTrue($acl->isAllowed('Moderator', 'Page', 'View'));
-        $this->assertTrue($acl->isAllowed('Admin', 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed('Moderator', 'Blog', 'View'));
+        $this->assertTrue($acl->isAllowed('Moderator', 'Site', 'View'));
     }
 
     public function testRemoveAllRules()
@@ -706,6 +717,58 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($acl->isAllowed('User', 'Page', 'Remove'));
     }
 
+    public function testGetResult()
+    {
+        $self = $this;
+
+        $testReturnResult = function ($result, $expected) use ($self) {
+            $index = 0;
+            foreach ($result as $r) {
+                $self->assertSame($expected[$index], $r->getRule());
+                $index++;
+            }
+            $self->assertEquals(count($expected), $index);
+        };
+
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $resource = new Resource('Page');
+
+        $view = new Rule('View');
+        $edit = new Rule('Edit');
+        $remove = new Rule('Remove');
+
+        $acl->addRule($user, $resource, $view, true);
+        $acl->addRule($user, $resource, $edit, true);
+        $acl->addRule($user, $resource, $remove, true);
+
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'Edit'));
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'Remove'));
+
+        $testReturnResult($acl->isAllowedReturnResult('User', 'Page', 'View'), array($view));
+        $testReturnResult($acl->isAllowedReturnResult('User', 'Page', 'Edit'), array($edit));
+        $testReturnResult($acl->isAllowedReturnResult('User', 'Page', 'Remove'), array($remove));
+
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $resource = new Resource('Page');
+
+        $acl->addRule($user, $resource, $view, false);
+        $acl->addRule($user, $resource, $edit, false);
+        $acl->addRule($user, $resource, $remove, false);
+
+        $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
+        $this->assertFalse($acl->isAllowed('User', 'Page', 'Edit'));
+        $this->assertFalse($acl->isAllowed('User', 'Page', 'Remove'));
+
+        $testReturnResult($acl->isAllowedReturnResult('User', 'Page', 'View'), array($view));
+        $testReturnResult($acl->isAllowedReturnResult('User', 'Page', 'Edit'), array($edit));
+        $testReturnResult($acl->isAllowedReturnResult('User', 'Page', 'Remove'), array($remove));
+    }
+
 
     /**
      * Testing edge conditions.
@@ -738,6 +801,40 @@ class AclTest extends PHPUnit_Framework_TestCase
         $acl->addRule($user, $page, new Rule('View'), false);
         $this->assertAttributeCount(3, 'rules', $acl);
         $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
+    }
+
+    public function testParentRolesAndResourcesWithMultipleRules()
+    {
+        $user = new Role('User');
+        $moderator = new Role('Moderator');
+        $admin = new Role('Admin');
+
+        $admin->addChild($moderator);
+        $moderator->addChild($user);
+
+        $page = new Resource('Page');
+        $blog = new Resource('Blog');
+        $site = new Resource('Site');
+
+        $site->addChild($blog);
+        $blog->addChild($page);
+
+        $acl = new Acl;
+
+        $acl->addRule($moderator, $blog, new Rule('View'), true);
+        $acl->addRule($user, $page, new Rule('View'), false);
+
+        $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed('User', 'Blog', 'View'));
+        $this->assertFalse($acl->isAllowed('User', 'Site', 'View'));
+
+        $this->assertTrue($acl->isAllowed('Moderator', 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed('Moderator', 'Blog', 'View'));
+        $this->assertFalse($acl->isAllowed('Moderator', 'Site', 'View'));
+
+        $this->assertFalse($acl->isAllowed('Admin', 'Page', 'View'));
+        $this->assertFalse($acl->isAllowed('Admin', 'Blog', 'View'));
+        $this->assertFalse($acl->isAllowed('Admin', 'Site', 'View'));
     }
 
     public function testEdgeConditionAggregateRolesFirstAddedRoleWins()
@@ -785,5 +882,121 @@ class AclTest extends PHPUnit_Framework_TestCase
         $siteGroup->removeResource('Page');
 
         $this->assertFalse($acl->isAllowed('User', $siteGroup, 'View'));
+    }
+
+    public function testComplexGraph()
+    {
+        $acl = new Acl();
+
+        $u = new Role('U');
+        $u1 = new Role('U1');
+        $u2 = new Role('U2');
+        $u3 = new Role('U3');
+
+        $u->addChild($u1);
+        $u->addChild($u2);
+        $u->addChild($u3);
+
+        $r = new Resource('R');
+        $r1 = new Resource('R1');
+        $r2 = new Resource('R2');
+        $r3 = new Resource('R3');
+        $r4 = new Resource('R4');
+        $r5 = new Resource('R5');
+
+        $r->addChild($r1);
+        $r->addChild($r2);
+        $r->addChild($r3);
+
+        $r3->addChild($r4);
+        $r3->addChild($r5);
+
+        $a = new Rule('View');
+
+        $acl->addRule($u, $r, $a, true);
+
+        $this->assertTrue($acl->isAllowed('U', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U', 'R1', 'View'));
+        $this->assertTrue($acl->isAllowed('U', 'R2', 'View'));
+        $this->assertTrue($acl->isAllowed('U', 'R3', 'View'));
+        $this->assertTrue($acl->isAllowed('U', 'R4', 'View'));
+        $this->assertTrue($acl->isAllowed('U', 'R5', 'View'));
+        $this->assertTrue($acl->isAllowed('U1', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U1', 'R1', 'View'));
+        $this->assertTrue($acl->isAllowed('U1', 'R2', 'View'));
+        $this->assertTrue($acl->isAllowed('U1', 'R3', 'View'));
+        $this->assertTrue($acl->isAllowed('U1', 'R4', 'View'));
+        $this->assertTrue($acl->isAllowed('U1', 'R5', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R1', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R2', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R3', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R4', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R5', 'View'));
+        $this->assertTrue($acl->isAllowed('U3', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U3', 'R1', 'View'));
+        $this->assertTrue($acl->isAllowed('U3', 'R2', 'View'));
+        $this->assertTrue($acl->isAllowed('U3', 'R3', 'View'));
+        $this->assertTrue($acl->isAllowed('U3', 'R4', 'View'));
+        $this->assertTrue($acl->isAllowed('U3', 'R5', 'View'));
+
+        $a2 = new Rule('View');
+
+        $acl->addRule($u, $r3, $a2, false);
+
+        $this->assertTrue($acl->isAllowed('U', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U', 'R1', 'View'));
+        $this->assertTrue($acl->isAllowed('U', 'R2', 'View'));
+        $this->assertFalse($acl->isAllowed('U', 'R3', 'View'));
+        $this->assertFalse($acl->isAllowed('U', 'R4', 'View'));
+        $this->assertFalse($acl->isAllowed('U', 'R5', 'View'));
+        $this->assertTrue($acl->isAllowed('U1', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U1', 'R1', 'View'));
+        $this->assertTrue($acl->isAllowed('U1', 'R2', 'View'));
+        $this->assertFalse($acl->isAllowed('U1', 'R3', 'View'));
+        $this->assertFalse($acl->isAllowed('U1', 'R4', 'View'));
+        $this->assertFalse($acl->isAllowed('U1', 'R5', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R1', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R2', 'View'));
+        $this->assertFalse($acl->isAllowed('U2', 'R3', 'View'));
+        $this->assertFalse($acl->isAllowed('U2', 'R4', 'View'));
+        $this->assertFalse($acl->isAllowed('U2', 'R5', 'View'));
+        $this->assertTrue($acl->isAllowed('U3', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U3', 'R1', 'View'));
+        $this->assertTrue($acl->isAllowed('U3', 'R2', 'View'));
+        $this->assertFalse($acl->isAllowed('U3', 'R3', 'View'));
+        $this->assertFalse($acl->isAllowed('U3', 'R4', 'View'));
+        $this->assertFalse($acl->isAllowed('U3', 'R5', 'View'));
+
+        $a3 = new Rule('View');
+        $a4 = new Rule('View');
+        $acl->addRule($u2, $r4, $a3, true);
+        $acl->addRule($u2, $r5, $a4, true);
+
+        $this->assertTrue($acl->isAllowed('U', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U', 'R1', 'View'));
+        $this->assertTrue($acl->isAllowed('U', 'R2', 'View'));
+        $this->assertFalse($acl->isAllowed('U', 'R3', 'View'));
+        $this->assertFalse($acl->isAllowed('U', 'R4', 'View'));
+        $this->assertFalse($acl->isAllowed('U', 'R5', 'View'));
+        $this->assertTrue($acl->isAllowed('U1', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U1', 'R1', 'View'));
+        $this->assertTrue($acl->isAllowed('U1', 'R2', 'View'));
+        $this->assertFalse($acl->isAllowed('U1', 'R3', 'View'));
+        $this->assertFalse($acl->isAllowed('U1', 'R4', 'View'));
+        $this->assertFalse($acl->isAllowed('U1', 'R5', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R1', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R2', 'View'));
+        $this->assertFalse($acl->isAllowed('U2', 'R3', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R4', 'View'));
+        $this->assertTrue($acl->isAllowed('U2', 'R5', 'View'));
+        $this->assertTrue($acl->isAllowed('U3', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U3', 'R1', 'View'));
+        $this->assertTrue($acl->isAllowed('U3', 'R2', 'View'));
+        $this->assertFalse($acl->isAllowed('U3', 'R3', 'View'));
+        $this->assertFalse($acl->isAllowed('U3', 'R4', 'View'));
+        $this->assertFalse($acl->isAllowed('U3', 'R5', 'View'));
     }
 }
