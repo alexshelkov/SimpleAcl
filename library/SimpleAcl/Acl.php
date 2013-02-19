@@ -98,19 +98,18 @@ class Acl
         $rule->setAction($action);
 
         if ( ! $this->hasRule($rule) ) {
-//            $this->rules[] = $rule;
-            $this->unShiftRule($rule);
+            $this->rules[] = $rule;
         }
     }
 
     /**
-     * Add rule at the top of rules array.
+     * Return rules indexes which used for walking by rules.
      *
-     * @param $rule
+     * @return array
      */
-    protected function unShiftRule($rule)
+    protected function rulesIndexes()
     {
-        array_unshift($this->rules, $rule);
+        return array_reverse(array_keys($this->rules));
     }
 
     /**
@@ -180,7 +179,8 @@ class Acl
     {
         $ruleResultCollection = new RuleResultCollection();
 
-        foreach ($this->rules as $rule) {
+        foreach ( $this->rulesIndexes() as $ruleIndex) {
+            $rule = $this->rules[$ruleIndex];
             if ( $rule->getName() == $ruleName ) {
                 $this->isRuleAllow($roleName, $resourceName, $rule, $ruleResultCollection);
             }
@@ -213,7 +213,8 @@ class Acl
             return;
         }
 
-        foreach ( $this->rules as $ruleIndex => $rule ) {
+        foreach ( $this->rulesIndexes() as $ruleIndex) {
+            $rule = $this->rules[$ruleIndex];
             if ( $ruleName === null || ($ruleName !== null && $ruleName == $rule->getName()) ) {
                 if ( $roleName === null || ($roleName !== null && $rule->getRole() && $rule->getRole()->getName() == $roleName) ) {
                     if ( $resourceName === null || ($resourceName !== null && $rule->getResource() && $rule->getResource()->getName() == $resourceName) ) {
