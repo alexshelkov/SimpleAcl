@@ -2,7 +2,7 @@
 namespace SimpleAcl;
 
 use SimpleAcl\RuleResult;
-use SplPriorityQueue;
+use SimpleAcl\SplPriorityQueue;
 use IteratorAggregate;
 
 /**
@@ -14,7 +14,7 @@ class RuleResultCollection implements IteratorAggregate
     /**
      * @var SplPriorityQueue
      */
-    protected $collection;
+    public $collection;
 
     public function __construct()
     {
@@ -23,7 +23,7 @@ class RuleResultCollection implements IteratorAggregate
 
     public function getIterator()
     {
-        return $this->collection;
+        return clone $this->collection;
     }
 
     /**
