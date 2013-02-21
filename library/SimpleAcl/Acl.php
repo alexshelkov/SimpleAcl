@@ -149,19 +149,17 @@ class Acl
      * Check is access allowed by some rule.
      * Returns null if rule don't match any role or resource.
      *
-     * @param string|RoleAggregateInterface $roleName
-     * @param string|ResourceAggregateInterface $resourceName
-     * @param Rule $rule
-     * @param RuleResultCollection $resultCollection
+     * @param string $roleName
+     * @param string $resourceName
+     * @param $ruleName
+     * @param RuleResultCollection $ruleResultCollection
      */
-    protected function isRuleAllow($roleName, $resourceName, Rule $rule, RuleResultCollection $ruleResultCollection)
+    protected function isRuleAllow($roleName, $resourceName, $ruleName, RuleResultCollection $ruleResultCollection)
     {
-        $roles = $this->getNames($roleName);
-        $resources = $this->getNames($resourceName);
-
-        foreach ( $roles as $role ) {
-            foreach ( $resources as $resource ) {
-                $result = $rule->isAllowed($role, $resource);
+        foreach ($this->rulesIndexes() as $ruleIndex) {
+            $rule = $this->rules[$ruleIndex];
+            if ( $rule->getName() == $ruleName ) {
+                $result = $rule->isAllowed($roleName, $resourceName);
                 $ruleResultCollection->add($result);
             }
         }
@@ -193,10 +191,12 @@ class Acl
     {
         $ruleResultCollection = new RuleResultCollection();
 
-        foreach ( $this->rulesIndexes() as $ruleIndex) {
-            $rule = $this->rules[$ruleIndex];
-            if ( $rule->getName() == $ruleName ) {
-                $this->isRuleAllow($roleName, $resourceName, $rule, $ruleResultCollection);
+        $roles = $this->getNames($roleName);
+        $resources = $this->getNames($resourceName);
+
+        foreach ($roles as $roleName) {
+            foreach ($resources as $resourceName) {
+                $this->isRuleAllow($roleName, $resourceName, $ruleName, $ruleResultCollection);
             }
         }
 

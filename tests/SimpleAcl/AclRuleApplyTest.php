@@ -637,6 +637,7 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($acl->isAllowed('Admin', 'Site', 'View'));
     }
 
+
     public function testEdgeConditionAggregateRolesFirstAddedRoleWins()
     {
         $acl = new Acl;
@@ -651,14 +652,55 @@ class AclTest extends PHPUnit_Framework_TestCase
         $userGroup->addRole($user);
         $userGroup->addRole($moderator);
 
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $acl->addRule($moderator, $page, new Rule('View'), false);
+
+        $this->assertTrue($acl->isAllowed($userGroup, 'Page', 'View'));
+
+        $userGroup->removeRole('User');
+        $this->assertFalse($acl->isAllowed($userGroup, 'Page', 'View'));
+        $userGroup->addRole($user);
+        $this->assertFalse($acl->isAllowed($userGroup, 'Page', 'View'));
+
+        $acl = new Acl;
+
+        $userGroup = new RoleAggregate();
+
+        $userGroup->addRole($user);
+        $userGroup->addRole($moderator);
+
+        // changing rule orders don't change result
         $acl->addRule($moderator, $page, new Rule('View'), false);
         $acl->addRule($user, $page, new Rule('View'), true);
 
         $this->assertTrue($acl->isAllowed($userGroup, 'Page', 'View'));
 
         $userGroup->removeRole('User');
-
         $this->assertFalse($acl->isAllowed($userGroup, 'Page', 'View'));
+        $userGroup->addRole($user);
+        $this->assertFalse($acl->isAllowed($userGroup, 'Page', 'View'));
+
+        // test case when priority matter
+        $acl = new Acl;
+
+        $userGroup = new RoleAggregate();
+
+        $userGroup->addRole($user);
+        $userGroup->addRole($moderator);
+
+        $contact = new Resource('Contact');
+        $page->addChild($contact);
+
+        $acl->addRule($moderator, $contact, new Rule('View'), true);
+        $acl->addRule($user, $page, new Rule('View'), false);
+
+        // user rule match first but moderator has higher priority
+        $this->assertTrue($acl->isAllowed($userGroup, 'Contact', 'View'));
+
+        $acl->addRule($user, $contact, new Rule('View'), false);
+
+        // now priorities are equal
+        $this->assertFalse($acl->isAllowed($userGroup, 'Contact', 'View'));
     }
 
     public function testEdgeConditionAggregateResourcesFirstAddedResourceWins()
