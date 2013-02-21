@@ -8,6 +8,7 @@ use SimpleAcl\Rule;
 use SimpleAcl\Role\RoleAggregateInterface;
 use SimpleAcl\Resource\ResourceAggregateInterface;
 use SimpleAcl\Exception\InvalidArgumentException;
+use SimpleAcl\Exception\RuntimeException;
 use SimpleAcl\RuleResultCollection;
 
 /**
@@ -37,6 +38,14 @@ class Acl
      */
     public function setRuleClass($ruleClass)
     {
+        if ( ! class_exists($ruleClass) ) {
+            throw new RuntimeException('Rule class not exist');
+        }
+
+        if ( ! is_subclass_of($ruleClass, 'SimpleAcl\Rule') && $ruleClass != 'SimpleAcl\Rule' ) {
+            throw new RuntimeException('Rule class must be instance of SimpleAcl\Rule');
+        }
+
         $this->ruleClass = $ruleClass;
     }
 
@@ -53,14 +62,15 @@ class Acl
     /**
      * Return true if rule was already added.
      *
-     * @param Rule $needRule
+     * @param Rule | mixed $needRule Rule or rule's id
      * @return bool
      */
-    public function hasRule(Rule $needRule)
+    public function hasRule($needRule)
     {
         foreach ( $this->rules as $rule ) {
-            if ( $rule === $needRule ) {
-                return true;
+            $needRuleId = ($needRule instanceof Rule) ? $needRule->getId() : $needRule;
+            if ( $rule->getId() == $needRuleId ) {
+                return $rule;
             }
         }
 
@@ -93,13 +103,17 @@ class Acl
             throw new InvalidArgumentException('Rule must be an instance of SimpleAcl\Rule or string');
         }
 
+        if ( $exchange = $this->hasRule($rule) ) {
+            $rule = $exchange;
+        }
+
+        if ( ! $exchange ) {
+            $this->rules[] = $rule;
+        }
+
         $rule->setRole($role);
         $rule->setResource($resource);
         $rule->setAction($action);
-
-        if ( ! $this->hasRule($rule) ) {
-            $this->rules[] = $rule;
-        }
     }
 
     /**
@@ -226,6 +240,21 @@ class Acl
                 }
             }
         }
+    }
 
+    /**
+     * Removes rule by its id.
+     *
+     * @param mixed $ruleId
+     */
+    public function removeRuleById($ruleId)
+    {
+        foreach ($this->rulesIndexes() as $ruleIndex) {
+            $rule = $this->rules[$ruleIndex];
+            if ( $rule->getId() == $ruleId ) {
+                unset($this->rules[$ruleIndex]);
+                return;
+            }
+        }
     }
 }

@@ -12,6 +12,13 @@ use SimpleAcl\RuleResult;
 class Rule
 {
     /**
+     * Holds rule id.
+     *
+     * @var mixed
+     */
+    protected $id;
+
+    /**
      * Hold name of rule.
      *
      * @var string
@@ -42,7 +49,38 @@ class Rule
      */
     public function __construct($name = null)
     {
+        $this->setId();
         $this->setName($name);
+    }
+
+    /**
+     * Creates an id for rule.
+     *
+     * @return mixed
+     */
+    protected function generateId()
+    {
+        return uniqid();
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id = null)
+    {
+        if ( is_null($id) ) {
+            $id = $this->generateId();
+        }
+
+        $this->id = $id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**

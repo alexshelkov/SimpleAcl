@@ -50,4 +50,11 @@ class RuleTest extends PHPUnit_Framework_TestCase
         $rule->setResource($resource);
         $this->assertSame($rule->getResource(), $resource);
     }
+
+    public function testId()
+    {
+        $rule = new Rule('Rule');
+
+        $this->assertNotNull($rule->getId());
+    }
 }
