@@ -19,5 +19,8 @@ class RuleResultTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('testNeedResource', $result->getNeedResourceName());
         $this->assertEquals(0, $result->getPriority());
         $this->assertEquals($rule->getAction($result), $result->getAction());
+
+        $result->setPriority(10);
+        $this->assertEquals(10, $result->getPriority());
     }
 }

@@ -30,6 +30,11 @@ class RuleResult
     protected $priority;
 
     /**
+     * @var string
+     */
+    protected  $id;
+
+    /**
      * @param Rule $rule
      * @param int $priority
      * @param $needRoleName
@@ -37,10 +42,19 @@ class RuleResult
      */
     public function __construct(Rule $rule, $priority, $needRoleName, $needResourceName)
     {
+        $this->id = uniqid('', true);
         $this->rule = $rule;
         $this->priority = $priority;
         $this->needRoleName = $needRoleName;
         $this->needResourceName = $needResourceName;
+    }
+
+    /**
+     * @param int $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
     }
 
     /**
@@ -81,5 +95,13 @@ class RuleResult
     public function getPriority()
     {
         return $this->priority;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 }

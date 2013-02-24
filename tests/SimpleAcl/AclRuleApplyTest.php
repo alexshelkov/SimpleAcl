@@ -9,6 +9,7 @@ use SimpleAcl\Resource;
 use SimpleAcl\Rule;
 use SimpleAcl\Role\RoleAggregate;
 use SimpleAcl\Resource\ResourceAggregate;
+use SimpleAcl\RuleResult;
 
 class AclTest extends PHPUnit_Framework_TestCase
 {
@@ -582,6 +583,128 @@ class AclTest extends PHPUnit_Framework_TestCase
         $acl->addRule($user, $resource, $nullAction, null);
 
         $this->assertTrue($acl->isAllowed('User', 'Resource', 'View'));
+    }
+
+    public function testActionCallable()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $resource = new Resource('Resource');
+
+        $acl->addRule($user, $resource, 'View', function () {
+            return true;
+        });
+
+        $this->assertTrue($acl->isAllowed('User', 'Resource', 'View'));
+    }
+
+    public function testChangePriorityViaActionCallable()
+    {
+        $getResults = function($resultCollection) {
+            $rs = array();
+            foreach ( $resultCollection as $r ) {
+                $rs[] = $r;
+            }
+            return $rs;
+        };
+
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $resource = new Resource('Resource');
+
+        $acl->addRule($user, $resource, 'View', function(RuleResult $r){
+            $r->setPriority(10);
+            return true;
+        });
+
+        $acl->addRule($user, $resource, 'View', false);
+
+        $this->assertTrue($acl->isAllowed('User', 'Resource', 'View'));
+
+        $acl = new Acl();
+
+        $p = new Role('P');
+        $c1 = new Role('C1');
+        $c2 = new Role('C2');
+        $c3 = new Role('C3');
+
+        $p->addChild($c1);
+        $p->addChild($c2);
+        $p->addChild($c3);
+
+        $view = new Rule('View');
+        $acl->addRule($p, $resource, $view, function (RuleResult $r) {
+            $role = $r->getNeedRoleName();
+
+            if ( $role == 'C3' || $role == 'P' ) {
+                return true;
+            }
+
+            $r->setPriority(10);
+
+            return $role == 'C1';
+        });
+
+        $view1 = new Rule('View');
+        $acl->addRule($c1, $resource, $view1, false);
+        $view2 = new Rule('View');
+        $acl->addRule($c2, $resource, $view2, true);
+        $view3 = new Rule('View');
+        $acl->addRule($c3, $resource, $view3, false);
+
+        $this->assertTrue($acl->isAllowed('P', 'Resource', 'View'));
+        $this->assertTrue($acl->isAllowed('C1', 'Resource', 'View'));
+        $this->assertFalse($acl->isAllowed('C2', 'Resource', 'View'));
+        $this->assertFalse($acl->isAllowed('C3', 'Resource', 'View'));
+
+        $rs = $getResults($acl->isAllowedReturnResult('P', 'Resource', 'View'));
+        $this->assertCount(1, $rs);
+        $this->assertEquals(0, $rs[0]->getPriority());
+        $this->assertTrue($rs[0]->getAction());
+        $this->assertSame($view, $rs[0]->getRule());
+        $this->assertSame('P', $rs[0]->getNeedRoleName());
+        $this->assertSame('Resource', $rs[0]->getNeedResourceName());
+
+        $rs = $getResults($acl->isAllowedReturnResult('C1', 'Resource', 'View'));
+        $this->assertCount(2, $rs);
+        $this->assertEquals(10, $rs[0]->getPriority());
+        $this->assertSame($view, $rs[0]->getRule());
+        $this->assertTrue($rs[0]->getAction());
+        $this->assertSame('C1', $rs[0]->getNeedRoleName());
+        $this->assertSame('Resource', $rs[0]->getNeedResourceName());
+        $this->assertEquals(0, $rs[1]->getPriority());
+        $this->assertFalse($rs[1]->getAction());
+        $this->assertSame($view1, $rs[1]->getRule());
+        $this->assertSame('C1', $rs[1]->getNeedRoleName());
+        $this->assertSame('Resource', $rs[1]->getNeedResourceName());
+
+        $rs = $getResults($acl->isAllowedReturnResult('C2', 'Resource', 'View'));
+        $this->assertCount(2, $rs);
+        $this->assertEquals(10, $rs[0]->getPriority());
+        $this->assertSame($view, $rs[0]->getRule());
+        $this->assertFalse($rs[0]->getAction());
+        $this->assertSame('C2', $rs[0]->getNeedRoleName());
+        $this->assertSame('Resource', $rs[0]->getNeedResourceName());
+        $this->assertEquals(0, $rs[1]->getPriority());
+        $this->assertTrue($rs[1]->getAction());
+        $this->assertSame($view2, $rs[1]->getRule());
+        $this->assertSame('C2', $rs[1]->getNeedRoleName());
+        $this->assertSame('Resource', $rs[1]->getNeedResourceName());
+
+        $rs = $getResults($acl->isAllowedReturnResult('C3', 'Resource', 'View'));
+        $this->assertCount(2, $rs);
+        $this->assertEquals(-1, $rs[1]->getPriority());
+        $this->assertSame($view, $rs[1]->getRule());
+        $this->assertTrue($rs[1]->getAction());
+        $this->assertSame('C3', $rs[1]->getNeedRoleName());
+        $this->assertSame('Resource', $rs[1]->getNeedResourceName());
+        $this->assertEquals(0, $rs[0]->getPriority());
+        $this->assertFalse($rs[0]->getAction());
+        $this->assertSame($view3, $rs[0]->getRule());
+        $this->assertSame('C3', $rs[0]->getNeedRoleName());
+        $this->assertSame('Resource', $rs[0]->getNeedResourceName());
     }
 
 

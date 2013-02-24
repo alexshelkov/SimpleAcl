@@ -82,4 +82,51 @@ class RuleTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($isCalled);
     }
+
+    public function testActionCache()
+    {
+        $rule = new Rule('Rule');
+        $ruleResult = new RuleResult($rule, 0, 'testNeedRoleName', 'testNeedResourceName');
+
+        $isCalled = 0;
+
+        $rule->setAction(function() use (&$isCalled) {
+            $isCalled++;
+        });
+
+        $rule->getAction($ruleResult);
+        $rule->getAction($ruleResult);
+        $rule->getAction($ruleResult);
+        $this->assertEquals(1, $isCalled);
+
+        $rule->setIsCacheAction(false);
+
+        $rule->getAction($ruleResult);
+        $rule->getAction($ruleResult);
+
+        $this->assertEquals(3, $isCalled);
+
+        $rule->setAction(function() use (&$isCalled) {
+            $isCalled += 100;
+        });
+
+        $rule->getAction($ruleResult);
+        $rule->getAction($ruleResult);
+
+        $this->assertEquals(203, $isCalled);
+
+        $rule->setIsCacheAction(true);
+
+        $rule->getAction($ruleResult);
+        $rule->getAction($ruleResult);
+
+        $this->assertEquals(303, $isCalled);
+
+        $ruleResult2 = new RuleResult($rule, 0, 'testNeedRoleName', 'testNeedResourceName');
+
+        $rule->getAction($ruleResult2);
+        $rule->getAction($ruleResult2);
+
+        $this->assertEquals(403, $isCalled);
+    }
 }
