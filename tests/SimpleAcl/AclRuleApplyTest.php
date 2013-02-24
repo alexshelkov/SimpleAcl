@@ -569,6 +569,21 @@ class AclTest extends PHPUnit_Framework_TestCase
         $testReturnResult($acl->isAllowedReturnResult('User', 'Page', 'View'), array($view4, $view3, $view2, $view1, $view));
     }
 
+    public function testRuleWithNullActionNotCounts()
+    {
+        $acl = new Acl;
+
+        $user = new Role('User');
+        $resource = new Resource('Resource');
+
+        $nullAction = new Rule('View');
+
+        $acl->addRule($user, $resource, 'View', true);
+        $acl->addRule($user, $resource, $nullAction, null);
+
+        $this->assertTrue($acl->isAllowed('User', 'Resource', 'View'));
+    }
+
 
     /**
      * Testing edge conditions.
@@ -603,7 +618,7 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
     }
 
-    public function testParentRolesAndResourcesWithMultipleRules()
+    public function testEdgeConditionParentRolesAndResourcesWithMultipleRules()
     {
         $user = new Role('User');
         $moderator = new Role('Moderator');
@@ -636,7 +651,6 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($acl->isAllowed('Admin', 'Blog', 'View'));
         $this->assertFalse($acl->isAllowed('Admin', 'Site', 'View'));
     }
-
 
     public function testEdgeConditionAggregateRolesFirstAddedRoleWins()
     {

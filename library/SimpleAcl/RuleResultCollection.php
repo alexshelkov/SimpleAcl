@@ -35,6 +35,10 @@ class RuleResultCollection implements IteratorAggregate
             return;
         }
 
+        if ( is_null($result->getAction()) ) {
+            return;
+        }
+
         $this->collection->insert($result, $result->getPriority());
     }
 

@@ -36,7 +36,7 @@ class RuleResultCollectionTest extends PHPUnit_Framework_TestCase
         $collection->add($result);
 
         $this->assertTrue($collection->any());
-        $this->assertEquals($result->getAction(), $collection->get());
+        $this->assertSame($result->getAction(), $collection->get());
 
         $index = 0;
         foreach ( $collection as $r ) {
@@ -69,5 +69,24 @@ class RuleResultCollectionTest extends PHPUnit_Framework_TestCase
             $index++;
         }
         $this->assertEquals(2, $index);
+    }
+
+    public function testResultWithNullAction()
+    {
+        $collection = new RuleResultCollection();
+
+        $rule = new Rule('Test');
+        $rule->setAction(null);
+        $result = new RuleResult($rule, 0, 'testNeedRole', 'testNeedResource');
+
+        $rule2 = new Rule('Test2');
+        $rule2->setAction(true);
+        $result2 = new RuleResult($rule2, 0, 'testNeedRole', 'testNeedResource');
+
+        $collection->add($result);
+        $this->assertFalse($collection->get());
+
+        $collection->add($result2);
+        $this->assertTrue($collection->get());
     }
 }

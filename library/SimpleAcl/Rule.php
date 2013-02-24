@@ -30,7 +30,7 @@ class Rule
      *
      * @var mixed
      */
-    protected $action;
+    protected $action = false;
 
     /**
      * @var Role
@@ -110,15 +110,17 @@ class Rule
     /**
      * @param RuleResult $ruleResult
      *
-     * @return bool
+     * @return bool|null
      */
     public function getAction(RuleResult $ruleResult)
     {
         if ( is_callable($this->action) ) {
-            $actionResult = (bool)call_user_func($this->action, $ruleResult);
+            $actionResult = call_user_func($this->action, $ruleResult);
         } else {
-            $actionResult = (bool)$this->action;
+            $actionResult = $this->action;
         }
+
+        $actionResult = is_null($actionResult) ? $actionResult : (bool)$actionResult;
 
         return $actionResult;
     }
