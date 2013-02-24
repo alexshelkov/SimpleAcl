@@ -11,10 +11,13 @@ class RuleResultTest extends PHPUnit_Framework_TestCase
     public function testRuleResult()
     {
         $rule = new Rule('Test');
-        $result = new RuleResult($rule, 0);
+        $rule->setAction(true);
+        $result = new RuleResult($rule, 0, 'testNeedRole', 'testNeedResource');
 
         $this->assertSame($rule, $result->getRule());
+        $this->assertEquals('testNeedRole', $result->getNeedRoleName());
+        $this->assertEquals('testNeedResource', $result->getNeedResourceName());
         $this->assertEquals(0, $result->getPriority());
-        $this->assertEquals($rule->getAction(), $result->getAction());
+        $this->assertEquals($rule->getAction($result), $result->getAction());
     }
 }

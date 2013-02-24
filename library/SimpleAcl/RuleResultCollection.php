@@ -47,6 +47,7 @@ class RuleResultCollection implements IteratorAggregate
             return false;
         }
 
+        /** @var RuleResult $result  */
         $result = $this->collection->top();
 
         return $result->getAction();

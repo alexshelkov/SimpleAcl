@@ -15,6 +15,16 @@ class RuleResult
     protected $rule;
 
     /**
+     * @var string
+     */
+    protected $needRoleName;
+
+    /**
+     * @var string
+     */
+    protected $needResourceName;
+
+    /**
      * @var int
      */
     protected $priority;
@@ -22,11 +32,31 @@ class RuleResult
     /**
      * @param Rule $rule
      * @param int $priority
+     * @param $needRoleName
+     * @param $needResourceName
      */
-    public function __construct(Rule $rule, $priority)
+    public function __construct(Rule $rule, $priority, $needRoleName, $needResourceName)
     {
         $this->rule = $rule;
         $this->priority = $priority;
+        $this->needRoleName = $needRoleName;
+        $this->needResourceName = $needResourceName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNeedResourceName()
+    {
+        return $this->needResourceName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNeedRoleName()
+    {
+        return $this->needRoleName;
     }
 
     /**
@@ -42,7 +72,7 @@ class RuleResult
      */
     public function getAction()
     {
-        return $this->getRule()->getAction();
+        return $this->getRule()->getAction($this);
     }
 
     /**

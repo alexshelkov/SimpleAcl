@@ -31,7 +31,7 @@ class RuleResultCollectionTest extends PHPUnit_Framework_TestCase
         $collection = new RuleResultCollection();
 
         $rule = new Rule('Test');
-        $result = new RuleResult($rule, 0);
+        $result = new RuleResult($rule, 0, 'testNeedRole', 'testNeedResource');
 
         $collection->add($result);
 
@@ -51,10 +51,10 @@ class RuleResultCollectionTest extends PHPUnit_Framework_TestCase
         $collection = new RuleResultCollection();
 
         $rule = new Rule('Test');
-        $result = new RuleResult($rule, 0);
+        $result = new RuleResult($rule, 0, 'testNeedRole', 'testNeedResource');
 
         $rule2 = new Rule('Test2');
-        $result2 = new RuleResult($rule2, 0);
+        $result2 = new RuleResult($rule2, 0, 'testNeedRole', 'testNeedResource');
 
         $collection->add($result);
         $collection->add($result2);

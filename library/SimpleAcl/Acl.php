@@ -93,10 +93,7 @@ class Acl
     {
         if ( is_string($rule) ) {
             $ruleClass = $this->getRuleClass();
-            $ruleName = $rule;
-            $rule = new $ruleClass();
-            /** @var Rule $rule */
-            $rule->setName($ruleName);
+            $rule = new $ruleClass($rule);
         }
 
         if ( ! $rule instanceof Rule ) {

@@ -47,7 +47,7 @@ class Rule
      *
      * @param $name
      */
-    public function __construct($name = null)
+    public function __construct($name)
     {
         $this->setId();
         $this->setName($name);
@@ -108,11 +108,19 @@ class Rule
     }
 
     /**
+     * @param RuleResult $ruleResult
+     *
      * @return bool
      */
-    public function getAction()
+    public function getAction(RuleResult $ruleResult)
     {
-        return (bool)$this->action;
+        if ( is_callable($this->action) ) {
+            $actionResult = (bool)call_user_func($this->action, $ruleResult);
+        } else {
+            $actionResult = (bool)$this->action;
+        }
+
+        return $actionResult;
     }
 
     /**
@@ -129,7 +137,7 @@ class Rule
     protected function isAllowedRecursive(Role $role, Resource $resource, $needRoleName, $needResourceName, $priority)
     {
         if ( $role->getName() == $needRoleName && $resource->getName() == $needResourceName ) {
-            return new RuleResult($this, $priority);
+            return new RuleResult($this, $priority, $needRoleName, $needResourceName);
         }
 
         foreach ( $role->getChildren() as $child ) {
