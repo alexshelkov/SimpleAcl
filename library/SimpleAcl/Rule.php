@@ -119,14 +119,14 @@ class Rule
     }
 
     /**
-     * @param RuleResult $ruleResult
+     * @param RuleResult|null $ruleResult
      *
      * @return bool|null
      */
-    public function getAction(RuleResult $ruleResult)
+    public function getAction(RuleResult $ruleResult = null)
     {
         $actionResult = $this->action;
-        if ( ! is_callable($actionResult) ) {
+        if ( ! is_callable($actionResult) || is_null($ruleResult) ) {
             return is_null($actionResult) ? $actionResult : (bool)$actionResult;
         }
 

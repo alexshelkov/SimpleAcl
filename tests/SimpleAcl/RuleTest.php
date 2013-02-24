@@ -25,19 +25,23 @@ class RuleTest extends PHPUnit_Framework_TestCase
 
         $rule->setAction(true);
         $this->assertTrue($rule->getAction($ruleResult));
+        $this->assertTrue($rule->getAction());
 
         $rule->setAction(false);
         $this->assertFalse($rule->getAction($ruleResult));
+        $this->assertFalse($rule->getAction());
 
         // Action can be mixed, but getAction must return bool
         $a = array();
         $rule->setAction($a);
         $this->assertFalse($rule->getAction($ruleResult));
+        $this->assertFalse($rule->getAction());
         $this->assertAttributeEquals($a, 'action', $rule);
 
         $a = array(1, 2, 3);
         $rule->setAction($a);
         $this->assertTrue($rule->getAction($ruleResult));
+        $this->assertTrue($rule->getAction());
         $this->assertAttributeEquals($a, 'action', $rule);
     }
 
@@ -59,6 +63,26 @@ class RuleTest extends PHPUnit_Framework_TestCase
         $rule = new Rule('Rule');
 
         $this->assertNotNull($rule->getId());
+    }
+
+    public function testActionCallableWithNullRuleResult()
+    {
+        $rule = new Rule('Rule');
+        $ruleResult = new RuleResult($rule, 0, 'testNeedRoleName', 'testNeedResourceName');
+
+        $self = $this;
+        $isCalled = false;
+
+        $rule->setAction(function() use (&$isCalled, $self) {
+            $isCalled = true;
+            return false;
+        });
+
+        $this->assertTrue($rule->getAction());
+        $this->assertFalse($isCalled);
+
+        $this->assertFalse($rule->getAction($ruleResult));
+        $this->assertTrue($isCalled);
     }
 
     public function testActionCallable()
