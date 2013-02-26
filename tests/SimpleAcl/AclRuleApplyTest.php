@@ -840,29 +840,6 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($acl->isAllowed($userGroup, 'Contact', 'View'));
     }
 
-    public function testEdgeConditionAggregateResourcesFirstAddedResourceWins()
-    {
-        $acl = new Acl;
-
-        $user = new Role('User');
-
-        $page = new Resource('Page');
-        $blog = new Resource('Blog');
-
-        $siteGroup = new ResourceAggregate();
-        $siteGroup->addResource($page);
-        $siteGroup->addResource($blog);
-
-        $acl->addRule($user, $blog, new Rule('View'), false);
-        $acl->addRule($user, $page, new Rule('View'), true);
-
-        $this->assertTrue($acl->isAllowed('User', $siteGroup, 'View'));
-
-        $siteGroup->removeResource('Page');
-
-        $this->assertFalse($acl->isAllowed('User', $siteGroup, 'View'));
-    }
-
     public function testComplexGraph()
     {
         $acl = new Acl();
