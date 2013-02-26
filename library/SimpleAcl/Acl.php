@@ -114,16 +114,6 @@ class Acl
     }
 
     /**
-     * Return rules indexes which used for walking by rules.
-     *
-     * @return array
-     */
-    protected function rulesIndexes()
-    {
-        return array_reverse(array_keys($this->rules));
-    }
-
-    /**
      * Get names.
      *
      * @param string|RoleAggregateInterface|ResourceAggregateInterface $object
@@ -153,8 +143,7 @@ class Acl
      */
     protected function isRuleAllow($roleName, $resourceName, $ruleName, RuleResultCollection $ruleResultCollection)
     {
-        foreach ($this->rulesIndexes() as $ruleIndex) {
-            $rule = $this->rules[$ruleIndex];
+        foreach ($this->rules as $rule) {
             if ( $rule->getName() == $ruleName ) {
                 $result = $rule->isAllowed($roleName, $resourceName);
                 $ruleResultCollection->add($result);
@@ -224,8 +213,7 @@ class Acl
             return;
         }
 
-        foreach ( $this->rulesIndexes() as $ruleIndex) {
-            $rule = $this->rules[$ruleIndex];
+        foreach ( $this->rules as $ruleIndex => $rule ) {
             if ( $ruleName === null || ($ruleName !== null && $ruleName == $rule->getName()) ) {
                 if ( $roleName === null || ($roleName !== null && $rule->getRole() && $rule->getRole()->getName() == $roleName) ) {
                     if ( $resourceName === null || ($resourceName !== null && $rule->getResource() && $rule->getResource()->getName() == $resourceName) ) {
@@ -246,8 +234,7 @@ class Acl
      */
     public function removeRuleById($ruleId)
     {
-        foreach ($this->rulesIndexes() as $ruleIndex) {
-            $rule = $this->rules[$ruleIndex];
+        foreach ($this->rules as $ruleIndex => $rule) {
             if ( $rule->getId() == $ruleId ) {
                 unset($this->rules[$ruleIndex]);
                 return;

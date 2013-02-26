@@ -61,7 +61,7 @@ class RuleResultCollectionTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($collection->any());
 
-        $results = array($result, $result2);
+        $results = array($result2, $result);
 
         $index = 0;
         foreach ( $collection as $r ) {

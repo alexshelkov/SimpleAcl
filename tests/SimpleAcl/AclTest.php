@@ -10,7 +10,7 @@ use SimpleAcl\Rule;
 use SimpleAcl\Role\RoleAggregate;
 use SimpleAcl\Resource\ResourceAggregate;
 
-class AclRuleApplyTest extends PHPUnit_Framework_TestCase
+class AclTest extends PHPUnit_Framework_TestCase
 {
     public function testThrowsExceptionWhenBadRule()
     {

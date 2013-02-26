@@ -11,7 +11,7 @@ use SimpleAcl\Role\RoleAggregate;
 use SimpleAcl\Resource\ResourceAggregate;
 use SimpleAcl\RuleResult;
 
-class AclTest extends PHPUnit_Framework_TestCase
+class AclRuleApplyTest extends PHPUnit_Framework_TestCase
 {
     public function testEmpty()
     {
@@ -729,16 +729,16 @@ class AclTest extends PHPUnit_Framework_TestCase
         $acl->removeRule(null, null, 'View', false);
 
         $this->assertAttributeCount(1, 'rules', $acl);
-        $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
-
-        $acl->addRule($user, $page, new Rule('View'), true);
-
-        $this->assertAttributeCount(2, 'rules', $acl);
         $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
 
         $acl->addRule($user, $page, new Rule('View'), false);
-        $this->assertAttributeCount(3, 'rules', $acl);
+
+        $this->assertAttributeCount(2, 'rules', $acl);
         $this->assertFalse($acl->isAllowed('User', 'Page', 'View'));
+
+        $acl->addRule($user, $page, new Rule('View'), true);
+        $this->assertAttributeCount(3, 'rules', $acl);
+        $this->assertTrue($acl->isAllowed('User', 'Page', 'View'));
     }
 
     public function testEdgeConditionParentRolesAndResourcesWithMultipleRules()
@@ -775,7 +775,7 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($acl->isAllowed('Admin', 'Site', 'View'));
     }
 
-    public function testEdgeConditionAggregateRolesFirstAddedRoleWins()
+    public function testEdgeConditionAggregateLastAddedWins()
     {
         $acl = new Acl;
 
@@ -786,8 +786,8 @@ class AclTest extends PHPUnit_Framework_TestCase
 
         $userGroup = new RoleAggregate();
 
-        $userGroup->addRole($user);
         $userGroup->addRole($moderator);
+        $userGroup->addRole($user);
 
         $acl->addRule($user, $page, new Rule('View'), true);
         $acl->addRule($moderator, $page, new Rule('View'), false);
@@ -797,14 +797,14 @@ class AclTest extends PHPUnit_Framework_TestCase
         $userGroup->removeRole('User');
         $this->assertFalse($acl->isAllowed($userGroup, 'Page', 'View'));
         $userGroup->addRole($user);
-        $this->assertFalse($acl->isAllowed($userGroup, 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed($userGroup, 'Page', 'View'));
 
         $acl = new Acl;
 
         $userGroup = new RoleAggregate();
 
-        $userGroup->addRole($user);
         $userGroup->addRole($moderator);
+        $userGroup->addRole($user);
 
         // changing rule orders don't change result
         $acl->addRule($moderator, $page, new Rule('View'), false);
@@ -815,15 +815,15 @@ class AclTest extends PHPUnit_Framework_TestCase
         $userGroup->removeRole('User');
         $this->assertFalse($acl->isAllowed($userGroup, 'Page', 'View'));
         $userGroup->addRole($user);
-        $this->assertFalse($acl->isAllowed($userGroup, 'Page', 'View'));
+        $this->assertTrue($acl->isAllowed($userGroup, 'Page', 'View'));
 
         // test case when priority matter
         $acl = new Acl;
 
         $userGroup = new RoleAggregate();
 
-        $userGroup->addRole($user);
         $userGroup->addRole($moderator);
+        $userGroup->addRole($user);
 
         $contact = new Resource('Contact');
         $page->addChild($contact);

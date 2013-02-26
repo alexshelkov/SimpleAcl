@@ -5,12 +5,12 @@ use SplPriorityQueue as Base;
 
 class SplPriorityQueue extends Base
 {
-    protected $queueOrder = PHP_INT_MAX;
+    protected $queueOrder = 0;
 
     public function insert($datum, $priority)
     {
         if ( is_int($priority) ) {
-            $priority = array($priority, $this->queueOrder--);
+            $priority = array($priority, $this->queueOrder++);
         }
         parent::insert($datum, $priority);
     }
