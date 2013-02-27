@@ -144,10 +144,8 @@ class Acl
     protected function isRuleAllow($roleName, $resourceName, $ruleName, RuleResultCollection $ruleResultCollection)
     {
         foreach ($this->rules as $rule) {
-            if ( $rule->getName() == $ruleName ) {
-                $result = $rule->isAllowed($roleName, $resourceName);
-                $ruleResultCollection->add($result);
-            }
+            $result = $rule->isAllowed($ruleName, $roleName, $resourceName);
+            $ruleResultCollection->add($result);
         }
     }
 

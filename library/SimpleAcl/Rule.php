@@ -184,15 +184,22 @@ class Rule
      * Check owing Role & Resource (and their children) and match its with $roleName & $resourceName;
      * if match was found depending on action allow or deny access to $resourceName for $roleName.
      *
-     * @param string $roleName
-     * @param string $resourceName
+     * @param $needRuleName
+     * @param string $needRoleName
+     * @param string $needResourceName
+     *
      * @return RuleResult|null null is returned if there is no matched Role & Resource in this rule.
      *                         RuleResult otherwise.
      */
-    public function isAllowed($roleName, $resourceName)
+    public function isAllowed($needRuleName, $needRoleName, $needResourceName)
     {
-        $this->cachedActions = array();
-        return $this->isAllowedRecursive($this->getRole(), $this->getResource(), $roleName, $resourceName, 0);
+        if ( $this->getName() == $needRuleName ) {
+            $this->cachedActions = array();
+
+            return $this->isAllowedRecursive($this->getRole(), $this->getResource(), $needRoleName, $needResourceName, 0);
+        }
+
+        return null;
     }
 
     /**
