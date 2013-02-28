@@ -73,7 +73,7 @@ var_dump($acl->isAllowed('Admin', 'SiteBackend', 'View')); // true
 ```
 Inheritance works for resources too.
 
-##### Advanced usage
+##### Using role and resource aggregates
 It is possible to check access not for particular Role or Resource, but for objects which aggregate them. These kind of objects must implement, respectively, SimpleAcl\Role\RoleAggregateInterface and SimpleAcl\Role\ResourceAggregateInterface.
 
 You can use SimpleAcl\Role\RoleAggregate and SimpleAcl\Role\ResourceAggregate as object which allow aggregation.
@@ -96,3 +96,5 @@ $acl->addRule($admin, $siteBackend, 'View', true);
 var_dump($acl->isAllowed($all, 'SiteFrontend', 'View')); // true
 var_dump($acl->isAllowed($all, 'SiteBackend', 'View')); // true
 ```
+
+__For more help check out wiki pages.__
