@@ -101,11 +101,11 @@ class ResourceAggregateTest extends PHPUnit_Framework_TestCase
         $site->removeResource('UnDefinedTow');
         $this->assertEquals(1, count($site->getResources()));
 
-        $site->removeResource('Tow');
+        $site->removeResource($resource2);
         $this->assertEquals(0, count($site->getResources()));
     }
 
-    public function testAddResourcectWithSameName()
+    public function testAddResourceWithSameName()
     {
         $site = new ResourceAggregate();
 
@@ -113,9 +113,9 @@ class ResourceAggregateTest extends PHPUnit_Framework_TestCase
         $resource2 = new Resource('One');
 
         $site->addResource($resource1);
-        $site->addResource($resource2); // last added wins
+        $site->addResource($resource2);
 
         $this->assertEquals(1, count($site->getResources()));
-        $this->assertSame($resource2, $site->getResource('One'));
+        $this->assertSame($resource1, $site->getResource('One'));
     }
 }

@@ -1,3 +1,5 @@
+2.0.12
+    - Start using recursive iterators for walking by objects
 2.0.11-2.0.1
     - Last added Role (Resource) to RoleAggregate (or ResourceAggregate) wins
 

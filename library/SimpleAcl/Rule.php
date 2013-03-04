@@ -4,6 +4,7 @@ namespace SimpleAcl;
 use SimpleAcl\Resource;
 use SimpleAcl\Role;
 use SimpleAcl\RuleResult;
+use RecursiveIteratorIterator;
 
 /**
  * Used to connects Role and Resources together.
@@ -147,7 +148,7 @@ class Rule
     }
 
     /**
-     * Used for recursively walk by Role & Resource children.
+     * Check if $role and $resource match to need role and resource.
      *
      * @param Role $role
      * @param Resource $resource
@@ -157,24 +158,10 @@ class Rule
      *
      * @return RuleResult|null
      */
-    protected function isAllowedRecursive(Role $role, Resource $resource, $needRoleName, $needResourceName, $priority)
+    protected function match(Role $role, Resource $resource, $needRoleName, $needResourceName, $priority)
     {
         if ( $role->getName() == $needRoleName && $resource->getName() == $needResourceName ) {
             return new RuleResult($this, $priority, $needRoleName, $needResourceName);
-        }
-
-        foreach ( $role->getChildren() as $child ) {
-            $isAllowed = $this->isAllowedRecursive($child, $resource, $needRoleName, $needResourceName, $priority - 1);
-            if ( $isAllowed !== null ) {
-                return $isAllowed;
-            }
-        }
-
-        foreach ( $resource->getChildren() as $child ) {
-            $isAllowed = $this->isAllowedRecursive($role, $child, $needRoleName, $needResourceName, $priority - 1);
-            if ( $isAllowed !== null ) {
-                return $isAllowed;
-            }
         }
 
         return null;
@@ -196,7 +183,18 @@ class Rule
         if ( $this->getName() == $needRuleName ) {
             $this->cachedActions = array();
 
-            return $this->isAllowedRecursive($this->getRole(), $this->getResource(), $needRoleName, $needResourceName, 0);
+            $roles = new RecursiveIteratorIterator($this->getRole(), RecursiveIteratorIterator::SELF_FIRST);
+            $resources = new RecursiveIteratorIterator($this->getResource(), RecursiveIteratorIterator::SELF_FIRST);
+            foreach ($roles as $role) {
+                foreach ($resources as $resource) {
+                    $depth = $roles->getDepth() + $resources->getDepth();
+                    $result = $this->match($role, $resource, $needRoleName, $needResourceName, -$depth);
+
+                    if ( $result ) {
+                        return $result;
+                    }
+                }
+            }
         }
 
         return null;

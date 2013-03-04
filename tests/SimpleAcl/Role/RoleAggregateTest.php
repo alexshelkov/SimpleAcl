@@ -101,7 +101,7 @@ class RoleAggregateTest extends PHPUnit_Framework_TestCase
         $user->removeRole('UnDefinedTow');
         $this->assertEquals(1, count($user->getRoles()));
 
-        $user->removeRole('Tow');
+        $user->removeRole($role2);
         $this->assertEquals(0, count($user->getRoles()));
     }
 
@@ -113,9 +113,9 @@ class RoleAggregateTest extends PHPUnit_Framework_TestCase
         $role2 = new Role('One');
 
         $user->addRole($role1);
-        $user->addRole($role2); // last added wins
+        $user->addRole($role2);
 
         $this->assertEquals(1, count($user->getRoles()));
-        $this->assertSame($role2, $user->getRole('One'));
+        $this->assertSame($role1, $user->getRole('One'));
     }
 }

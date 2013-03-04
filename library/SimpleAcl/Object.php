@@ -1,11 +1,14 @@
 <?php
 namespace SimpleAcl;
 
+use IteratorAggregate;
+use SimpleAcl\Object\RecursiveIterator;
+
 /**
  * Use to keep shared function between Roles and Resources.
  *
  */
-abstract class Object
+abstract class Object implements IteratorAggregate
 {
     /**
      * Hold the name of object.
@@ -21,6 +24,13 @@ abstract class Object
      */
     protected $children = array();
 
+    /**
+     * @return RecursiveIterator
+     */
+    public function getIterator()
+    {
+        return new RecursiveIterator(array($this));
+    }
     /**
      * Create Object with given name.
      *
@@ -63,14 +73,18 @@ abstract class Object
     /**
      * Remove child, return true if child was removed.
      *
-     * @param Object $needChild
+     * @param Object|string $needChild
      *
      * @return bool
      */
-    public function removeChild(Object $needChild)
+    public function removeChild($needChild)
     {
-        foreach ($this->children as $childIndex => $haveChild) {
-            if ( $haveChild === $needChild ) {
+        if ( $needChild instanceof Object ) {
+            $needChild = $needChild->getName();
+        }
+
+        foreach ($this->children as $childIndex => $child) {
+            if ( $child->getName() == $needChild ) {
                 unset($this->children[$childIndex]);
                 return true;
             }
@@ -82,17 +96,22 @@ abstract class Object
     /**
      * Checks if object have child.
      *
-     * @param Object $needChild
+     * @param Object|string $childName
      *
      * @return null|Object
      */
-    public function hasChild(Object $needChild)
+    public function hasChild($childName)
     {
-        foreach ( $this->children as $haveChild ) {
-            if ( $haveChild === $needChild ) {
-                return $needChild;
+        if ( $childName instanceof Object ) {
+            $childName = $childName->getName();
+        }
+
+        foreach ( $this->children as $child ) {
+            if ( $child->getName() == $childName ) {
+                return $child;
             }
         }
+
         return null;
     }
 

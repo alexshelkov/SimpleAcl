@@ -42,7 +42,7 @@ class RuleResult
      */
     public function __construct(Rule $rule, $priority, $needRoleName, $needResourceName)
     {
-        $this->id = uniqid('', true);
+        $this->id = uniqid();
         $this->rule = $rule;
         $this->priority = $priority;
         $this->needRoleName = $needRoleName;
