@@ -72,21 +72,6 @@ class RecursiveIteratorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($iterator->hasChildren());
     }
 
-//    public function testGetChildren()
-//    {
-//        $iterator = new RecursiveIterator(array());
-//        $this->assertFalse($iterator->hasChildren());
-//
-//        $parent = $this->getObject('Test1');
-//
-//        $child = $this->getObject('Test2');
-//        $parent->addChild($child);
-//
-//        $iterator = new RecursiveIterator(array($parent));
-//
-//        $this->assertTrue($iterator->hasChildren());
-//    }
-
     public function testIterate()
     {
         $parent = $this->getObject('parent');
