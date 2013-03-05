@@ -22,7 +22,7 @@ class RecursiveIterator implements SplIterator
 
     public function next()
     {
-        next($this->objects);
+        return next($this->objects);
     }
 
     public function key()
@@ -36,17 +36,17 @@ class RecursiveIterator implements SplIterator
 
     public function valid()
     {
-        return key($this->objects) !== null;
+        return $this->key() !== null;
     }
 
     public function rewind()
     {
-        reset($this->objects);
+        return reset($this->objects);
     }
 
     public function hasChildren()
     {
-        if ( is_null(key($this->objects)) ) {
+        if ( is_null($this->key()) ) {
             return false;
         }
 
@@ -57,12 +57,11 @@ class RecursiveIterator implements SplIterator
 
     public function getChildren()
     {
-        $object = current($this->objects);
+        $object = $this->current();
         $children = $object->getChildren();
 
         return new RecursiveIterator($children);
     }
-
 
     public function __construct($objects)
     {
