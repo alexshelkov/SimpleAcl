@@ -1,3 +1,6 @@
+2.0.15
+    - Add ability get aggregate from rules and RuleResult
+
 2.0.14-2.0.12
     - Start using recursive iterators for walking by objects
 

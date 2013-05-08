@@ -955,4 +955,29 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($acl->isAllowed('U3', 'R4', 'View'));
         $this->assertFalse($acl->isAllowed('U3', 'R5', 'View'));
     }
+
+    public function testSetAggregates()
+    {
+        $acl = new Acl();
+
+        $u = new Role('U');
+        $r = new Resource('R');
+
+        $roleAgr = new RoleAggregate();
+        $roleAgr->addRole($u);
+
+        $resourceAgr = new ResourceAggregate();
+        $resourceAgr->addResource($r);
+
+        $self = $this;
+
+        $acl->addRule($u, $r, 'View', function(RuleResult $r) use ($roleAgr, $resourceAgr, $self, &$run) {
+            $self->assertSame($roleAgr, $r->getRoleAggregate());
+            $self->assertSame($resourceAgr, $r->getResourceAggregate());
+
+            return true;
+        });
+
+        $this->assertTrue($acl->isAllowed($roleAgr, $resourceAgr, 'View'));
+    }
 }

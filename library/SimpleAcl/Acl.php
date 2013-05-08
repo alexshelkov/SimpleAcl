@@ -140,10 +140,19 @@ class Acl
      * @param string $resourceName
      * @param $ruleName
      * @param RuleResultCollection $ruleResultCollection
+     * @param string|RoleAggregateInterface $roleAggregate
+     * @param string|ResourceAggregateInterface $resourceAggregate
      */
-    protected function isRuleAllow($roleName, $resourceName, $ruleName, RuleResultCollection $ruleResultCollection)
+    protected function isRuleAllow($roleName, $resourceName, $ruleName, RuleResultCollection $ruleResultCollection, $roleAggregate, $resourceAggregate)
     {
         foreach ($this->rules as $rule) {
+            if ( $roleAggregate instanceof RoleAggregateInterface ) {
+                $rule->setRoleAggregate($roleAggregate);
+            }
+            if ( $resourceAggregate instanceof ResourceAggregateInterface ) {
+                $rule->setResourceAggregate($resourceAggregate);
+            }
+
             $result = $rule->isAllowed($ruleName, $roleName, $resourceName);
             $ruleResultCollection->add($result);
         }
@@ -165,22 +174,22 @@ class Acl
     /**
      * Checks is access allowed.
      *
-     * @param string|RoleAggregateInterface $roleName
-     * @param string|ResourceAggregateInterface $resourceName
+     * @param string|RoleAggregateInterface $roleAggregate
+     * @param string|ResourceAggregateInterface $resourceAggregate
      * @param string $ruleName
      *
      * @return RuleResultCollection
      */
-    public function isAllowedReturnResult($roleName, $resourceName, $ruleName)
+    public function isAllowedReturnResult($roleAggregate, $resourceAggregate, $ruleName)
     {
         $ruleResultCollection = new RuleResultCollection();
 
-        $roles = $this->getNames($roleName);
-        $resources = $this->getNames($resourceName);
+        $roles = $this->getNames($roleAggregate);
+        $resources = $this->getNames($resourceAggregate);
 
         foreach ($roles as $roleName) {
             foreach ($resources as $resourceName) {
-                $this->isRuleAllow($roleName, $resourceName, $ruleName, $ruleResultCollection);
+                $this->isRuleAllow($roleName, $resourceName, $ruleName, $ruleResultCollection, $roleAggregate, $resourceAggregate);
             }
         }
 

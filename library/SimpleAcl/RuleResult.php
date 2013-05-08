@@ -3,6 +3,9 @@ namespace SimpleAcl;
 
 use SimpleAcl\Rule;
 
+use SimpleAcl\Role\RoleAggregateInterface;
+use SimpleAcl\Resource\ResourceAggregateInterface;
+
 /**
  * Returned as result of Rule::isAllowed
  *
@@ -103,5 +106,21 @@ class RuleResult
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return ResourceAggregateInterface
+     */
+    public function getResourceAggregate()
+    {
+        return $this->getRule()->getResourceAggregate();
+    }
+
+    /**
+     * @return RoleAggregateInterface
+     */
+    public function getRoleAggregate()
+    {
+        return $this->getRule()->getRoleAggregate();
     }
 }

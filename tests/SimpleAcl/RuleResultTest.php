@@ -10,7 +10,13 @@ class RuleResultTest extends PHPUnit_Framework_TestCase
 {
     public function testRuleResult()
     {
+        $roleAggregate = $this->getMock('SimpleAcl\Role\RoleAggregateInterface');
+        $resourceAggregate = $this->getMock('SimpleAcl\Resource\ResourceAggregateInterface');
+
         $rule = new Rule('Test');
+
+        $rule->setRoleAggregate($roleAggregate);
+        $rule->setResourceAggregate($resourceAggregate);
         $rule->setAction(true);
         $result = new RuleResult($rule, 0, 'testNeedRole', 'testNeedResource');
 
@@ -22,5 +28,8 @@ class RuleResultTest extends PHPUnit_Framework_TestCase
 
         $result->setPriority(10);
         $this->assertEquals(10, $result->getPriority());
+
+        $this->assertSame($roleAggregate, $result->getRoleAggregate());
+        $this->assertSame($resourceAggregate, $result->getResourceAggregate());
     }
 }

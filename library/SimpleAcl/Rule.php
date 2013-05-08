@@ -6,6 +6,9 @@ use SimpleAcl\Role;
 use SimpleAcl\RuleResult;
 use RecursiveIteratorIterator;
 
+use SimpleAcl\Role\RoleAggregateInterface;
+use SimpleAcl\Resource\ResourceAggregateInterface;
+
 /**
  * Used to connects Role and Resources together.
  *
@@ -54,6 +57,16 @@ class Rule
     public $cachedActions = array();
 
     /**
+     * @var RoleAggregateInterface
+     */
+    protected $roleAggregate;
+
+    /**
+     * @var ResourceAggregateInterface
+     */
+    protected $resourceAggregate;
+
+    /**
      * Create Rule with given name.
      *
      * @param $name
@@ -62,6 +75,38 @@ class Rule
     {
         $this->setId();
         $this->setName($name);
+    }
+
+    /**
+     * @param ResourceAggregateInterface $resourceAggregate
+     */
+    public function setResourceAggregate(ResourceAggregateInterface $resourceAggregate)
+    {
+        $this->resourceAggregate = $resourceAggregate;
+    }
+
+    /**
+     * @return ResourceAggregateInterface
+     */
+    public function getResourceAggregate()
+    {
+        return $this->resourceAggregate;
+    }
+
+    /**
+     * @param RoleAggregateInterface $roleAggregate
+     */
+    public function setRoleAggregate(RoleAggregateInterface $roleAggregate)
+    {
+        $this->roleAggregate = $roleAggregate;
+    }
+
+    /**
+     * @return RoleAggregateInterface
+     */
+    public function getRoleAggregate()
+    {
+        return $this->roleAggregate;
     }
 
     /**
