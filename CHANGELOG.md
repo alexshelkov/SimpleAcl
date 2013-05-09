@@ -1,3 +1,6 @@
+2.0.16
+    - Fix problem with resetting aggregates
+
 2.0.15
     - Add ability get aggregate from rules and RuleResult
 

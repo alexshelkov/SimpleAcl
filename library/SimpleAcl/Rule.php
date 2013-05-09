@@ -77,6 +77,12 @@ class Rule
         $this->setName($name);
     }
 
+    public function resetAggregate()
+    {
+        $this->roleAggregate = null;
+        $this->resourceAggregate = null;
+    }
+
     /**
      * @param ResourceAggregateInterface $resourceAggregate
      */

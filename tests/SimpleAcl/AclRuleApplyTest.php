@@ -971,13 +971,26 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
 
         $self = $this;
 
-        $acl->addRule($u, $r, 'View', function(RuleResult $r) use ($roleAgr, $resourceAgr, $self, &$run) {
+        $rule = new Rule('View');
+
+        $acl->addRule($u, $r, $rule, function (RuleResult $r) use ($roleAgr, $resourceAgr, $self) {
             $self->assertSame($roleAgr, $r->getRoleAggregate());
             $self->assertSame($resourceAgr, $r->getResourceAggregate());
 
             return true;
         });
 
+
+
         $this->assertTrue($acl->isAllowed($roleAgr, $resourceAgr, 'View'));
+
+        $rule->setAction(function (RuleResult $r) use ($self) {
+            $self->assertNull($r->getRoleAggregate());
+            $self->assertNull($r->getResourceAggregate());
+
+            return true;
+        });
+
+        $this->assertTrue($acl->isAllowed('U', 'R', 'View'));
     }
 }
