@@ -47,16 +47,6 @@ class Rule
     protected $resource;
 
     /**
-     * @var bool
-     */
-    protected $isCacheAction = true;
-
-    /**
-     * @var array
-     */
-    public $cachedActions = array();
-
-    /**
      * @var RoleAggregateInterface
      */
     protected $roleAggregate;
@@ -77,10 +67,25 @@ class Rule
         $this->setName($name);
     }
 
-    public function resetAggregate()
+    /**
+     * Set aggregate objects.
+     *
+     * @param $roleAggregate
+     * @param $resourceAggregate
+     */
+    public function resetAggregate($roleAggregate, $resourceAggregate)
     {
-        $this->roleAggregate = null;
-        $this->resourceAggregate = null;
+        if ( $roleAggregate instanceof RoleAggregateInterface ) {
+            $this->setRoleAggregate($roleAggregate);
+        } else {
+            $this->roleAggregate = null;
+        }
+
+        if ( $resourceAggregate instanceof ResourceAggregateInterface ) {
+            $this->setResourceAggregate($resourceAggregate);
+        } else {
+            $this->resourceAggregate = null;
+        }
     }
 
     /**
@@ -166,7 +171,6 @@ class Rule
      */
     public function setAction($action)
     {
-        $this->cachedActions = array();
         $this->action = $action;
     }
 
@@ -182,18 +186,8 @@ class Rule
             return is_null($actionResult) ? $actionResult : (bool)$actionResult;
         }
 
-        $id = $ruleResult->getId();
-
-        if ( $this->isCacheAction() && array_key_exists($id, $this->cachedActions) ) {
-            return $this->cachedActions[$id];
-        }
-
         $actionResult = call_user_func($this->action, $ruleResult);
         $actionResult = is_null($actionResult) ? $actionResult : (bool)$actionResult;
-
-        if ( $this->isCacheAction() ) {
-            $this->cachedActions[$id] = $actionResult;
-        }
 
         return $actionResult;
     }
@@ -232,8 +226,6 @@ class Rule
     public function isAllowed($needRuleName, $needRoleName, $needResourceName)
     {
         if ( $this->getName() == $needRuleName ) {
-            $this->cachedActions = array();
-
             $roles = new RecursiveIteratorIterator($this->getRole(), RecursiveIteratorIterator::SELF_FIRST);
             $resources = new RecursiveIteratorIterator($this->getResource(), RecursiveIteratorIterator::SELF_FIRST);
             foreach ($roles as $role) {
@@ -281,21 +273,5 @@ class Rule
     public function getResource()
     {
         return $this->resource;
-    }
-
-    /**
-     * @param boolean $isCacheActionInRuleResult
-     */
-    public function setIsCacheAction($isCacheActionInRuleResult)
-    {
-        $this->isCacheAction = $isCacheActionInRuleResult;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isCacheAction()
-    {
-        return $this->isCacheAction;
     }
 }

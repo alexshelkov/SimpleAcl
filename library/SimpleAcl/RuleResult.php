@@ -35,7 +35,17 @@ class RuleResult
     /**
      * @var string
      */
-    protected  $id;
+    protected $id;
+
+    /**
+     * @var
+     */
+    protected $action;
+
+    /**
+     * @var bool
+     */
+    protected $isInit = false;
 
     /**
      * @param Rule $rule
@@ -89,7 +99,12 @@ class RuleResult
      */
     public function getAction()
     {
-        return $this->getRule()->getAction($this);
+        if ( ! $this->isInit ) {
+            $this->action = $this->getRule()->getAction($this);
+            $this->isInit = true;
+        }
+
+        return $this->action;
     }
 
     /**

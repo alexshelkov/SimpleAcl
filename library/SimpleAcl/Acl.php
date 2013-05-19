@@ -146,14 +146,7 @@ class Acl
     protected function isRuleAllow($roleName, $resourceName, $ruleName, RuleResultCollection $ruleResultCollection, $roleAggregate, $resourceAggregate)
     {
         foreach ($this->rules as $rule) {
-            $rule->resetAggregate();
-
-            if ( $roleAggregate instanceof RoleAggregateInterface ) {
-                $rule->setRoleAggregate($roleAggregate);
-            }
-            if ( $resourceAggregate instanceof ResourceAggregateInterface ) {
-                $rule->setResourceAggregate($resourceAggregate);
-            }
+            $rule->resetAggregate($roleAggregate, $resourceAggregate);
 
             $result = $rule->isAllowed($ruleName, $roleName, $resourceName);
             $ruleResultCollection->add($result);

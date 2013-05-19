@@ -73,6 +73,36 @@ var_dump($acl->isAllowed('Admin', 'SiteBackend', 'View')); // true
 ```
 Inheritance works for resources too.
 
+##### Using callbacks
+You can create more complex rules using callbacks.
+```php
+$acl = new Acl();
+
+$user = new Role('User');
+$siteFrontend = new Resource('SiteFrontend');
+
+$acl->addRule($user, $siteFrontend, 'View', function (SimpleAcl\RuleResult $ruleResult) {
+    echo $ruleResult->getNeedRoleName() . "\n";
+    echo $ruleResult->getNeedResourceName() . "\n";
+    echo $ruleResult->getPriority() . "\n";
+    echo $ruleResult->getRule()->getRole()->getName() . "\n";
+    echo $ruleResult->getRule()->getResource()->getName() . "\n";
+
+    return true;
+});
+
+
+var_dump($acl->isAllowed('User', 'SiteFrontend', 'View')); // true
+
+// Outputs:
+// User
+// SiteFrontend
+// 0
+// User
+// SiteFrontend
+// bool(true)
+```
+
 ##### Using role and resource aggregates
 It is possible to check access not for particular Role or Resource, but for objects which aggregate them. These kind of objects must implement, respectively, SimpleAcl\Role\RoleAggregateInterface and SimpleAcl\Role\ResourceAggregateInterface.
 
@@ -95,6 +125,16 @@ $acl->addRule($admin, $siteBackend, 'View', true);
 
 var_dump($acl->isAllowed($all, 'SiteFrontend', 'View')); // true
 var_dump($acl->isAllowed($all, 'SiteBackend', 'View')); // true
+```
+
+You can have access to role and resource aggregates in callbacks.
+```php
+$acl->addRule($user, $siteFrontend, 'View', function (SimpleAcl\RuleResult $ruleResult) {
+    var_dump($ruleResult->getRoleAggregate());
+    var_dump($ruleResult->getResourceAggregate());
+});
+
+var_dump($acl->isAllowed($all, 'SiteFrontend', 'View')); // true
 ```
 
 __For more help check out wiki pages.__

@@ -1,3 +1,6 @@
+2.0.17
+    - Minor refactoring
+
 2.0.16
     - Fix problem with resetting aggregates
 

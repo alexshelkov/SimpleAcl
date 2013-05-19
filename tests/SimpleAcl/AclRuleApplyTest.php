@@ -707,6 +707,41 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
         $this->assertSame('Resource', $rs[0]->getNeedResourceName());
     }
 
+    public function testSetAggregates()
+    {
+        $acl = new Acl();
+
+        $u = new Role('U');
+        $r = new Resource('R');
+
+        $roleAgr = new RoleAggregate();
+        $roleAgr->addRole($u);
+
+        $resourceAgr = new ResourceAggregate();
+        $resourceAgr->addResource($r);
+
+        $self = $this;
+
+        $rule = new Rule('View');
+
+        $acl->addRule($u, $r, $rule, function (RuleResult $r) use ($roleAgr, $resourceAgr, $self) {
+            $self->assertSame($roleAgr, $r->getRoleAggregate());
+            $self->assertSame($resourceAgr, $r->getResourceAggregate());
+
+            return true;
+        });
+
+        $this->assertTrue($acl->isAllowed($roleAgr, $resourceAgr, 'View'));
+
+        $rule->setAction(function (RuleResult $r) use ($self) {
+            $self->assertNull($r->getRoleAggregate());
+            $self->assertNull($r->getResourceAggregate());
+
+            return true;
+        });
+
+        $this->assertTrue($acl->isAllowed('U', 'R', 'View'));
+    }
 
     /**
      * Testing edge conditions.
@@ -954,43 +989,5 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($acl->isAllowed('U3', 'R3', 'View'));
         $this->assertFalse($acl->isAllowed('U3', 'R4', 'View'));
         $this->assertFalse($acl->isAllowed('U3', 'R5', 'View'));
-    }
-
-    public function testSetAggregates()
-    {
-        $acl = new Acl();
-
-        $u = new Role('U');
-        $r = new Resource('R');
-
-        $roleAgr = new RoleAggregate();
-        $roleAgr->addRole($u);
-
-        $resourceAgr = new ResourceAggregate();
-        $resourceAgr->addResource($r);
-
-        $self = $this;
-
-        $rule = new Rule('View');
-
-        $acl->addRule($u, $r, $rule, function (RuleResult $r) use ($roleAgr, $resourceAgr, $self) {
-            $self->assertSame($roleAgr, $r->getRoleAggregate());
-            $self->assertSame($resourceAgr, $r->getResourceAggregate());
-
-            return true;
-        });
-
-
-
-        $this->assertTrue($acl->isAllowed($roleAgr, $resourceAgr, 'View'));
-
-        $rule->setAction(function (RuleResult $r) use ($self) {
-            $self->assertNull($r->getRoleAggregate());
-            $self->assertNull($r->getResourceAggregate());
-
-            return true;
-        });
-
-        $this->assertTrue($acl->isAllowed('U', 'R', 'View'));
     }
 }
