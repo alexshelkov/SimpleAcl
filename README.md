@@ -51,6 +51,22 @@ var_dump($acl->isAllowed('User', 'SiteBackend', 'View')); // false
 var_dump($acl->isAllowed('Admin', 'SiteFrontend', 'View')); // true
 var_dump($acl->isAllowed('Admin', 'SiteBackend', 'View')); // true
 ```
+They are various way to add rules to *Acl*, addRule method accepts from one to four arguments, so you can also add rules like this:
+```php
+<?php
+// before add $view rule to Acl you can set it action, role or resource
+$acl->addRule($view);
+
+// where is true -- is action
+$acl->addRule($view, true);
+
+// in that case action must be set before adding rule
+$acl->addRule($user, $siteBackend, $view);
+
+$acl->addRule($admin, $siteFrontend, 'View', true); // you can use string as rule
+$acl->addRule($admin, $siteBackend, 'View', true);
+```
+
 ###### Roles and resource inheritance
 As you maybe notice in previous example we have some duplication of code, because both "User" and "Admin" was allowed to "View" "SiteFrontend" we added 2 rules. But it is possible to avoid this using roles inheritance.
 ```php
