@@ -19,6 +19,30 @@ class AclTest extends PHPUnit_Framework_TestCase
         $acl->addRule(new Role('User'), new Resource('Page'), new \stdClass(), true);
     }
 
+	public function testThrowsExceptionWhenBadArgumentsCount()
+	{
+		$this->setExpectedException('SimpleAcl\Exception\InvalidArgumentException', 'accepts only one, tow, three or four arguments');
+
+		$acl = new Acl;
+		$acl->addRule(new Role(1), new Resource(1), new Rule(1), true, 'test');
+	}
+
+	public function testThrowsExceptionWhenBadRole()
+	{
+		$this->setExpectedException('SimpleAcl\Exception\InvalidArgumentException', 'Role must be an instance of SimpleAcl\Role or null');
+
+		$acl = new Acl;
+		$acl->addRule(new \StdClass(1), new Resource('test'), new Rule('test'), true);
+	}
+
+	public function testThrowsExceptionWhenBadResource()
+	{
+		$this->setExpectedException('SimpleAcl\Exception\InvalidArgumentException', 'Resource must be an instance of SimpleAcl\Resource or null');
+
+		$acl = new Acl;
+		$acl->addRule(new Role('test'), new \StdClass(1), new Rule('test'), true);
+	}
+
     public function testSetRuleClassOriginal()
     {
         $acl = new Acl;
@@ -93,6 +117,22 @@ class AclTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($acl->isAllowed('SuperUser', 'SuperPage', 'Edit'));
 
         $this->assertAttributeCount(1, 'rules', $acl);
+
+	    // rule should overwrite $role, $resource and $action when they actually used in addRule
+
+	    $acl->addRule($superUser, $superPage, $rule);
+	    $this->assertFalse($acl->isAllowed('SuperUser', 'SuperPage', 'Edit'));
+	    $this->assertAttributeCount(1, 'rules', $acl);
+
+	    $acl->addRule($rule);
+	    $this->assertFalse($acl->isAllowed('SuperUser', 'SuperPage', 'Edit'));
+	    $this->assertSame($rule->getRole(), $superUser);
+	    $this->assertSame($rule->getResource(), $superPage);
+
+	    $acl->addRule($rule, true);
+	    $this->assertTrue($acl->isAllowed('SuperUser', 'SuperPage', 'Edit'));
+	    $this->assertSame($rule->getRole(), $superUser);
+	    $this->assertSame($rule->getResource(), $superPage);
     }
 
     public function testRemoveAllRules()

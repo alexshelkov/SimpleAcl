@@ -195,17 +195,18 @@ class Rule
     /**
      * Check if $role and $resource match to need role and resource.
      *
-     * @param Role $role
-     * @param Resource $resource
+     * @param Role|null $role
+     * @param Resource|null $resource
      * @param string $needRoleName
      * @param string $needResourceName
      * @param $priority
      *
      * @return RuleResult|null
      */
-    protected function match(Role $role, Resource $resource, $needRoleName, $needResourceName, $priority)
+    protected function match(Role $role = null, Resource $resource = null, $needRoleName, $needResourceName, $priority)
     {
-        if ( $role->getName() == $needRoleName && $resource->getName() == $needResourceName ) {
+        if ( (is_null($role) || ($role && $role->getName() == $needRoleName)) &&
+	        (is_null($resource) || ($resource && $resource->getName() == $needResourceName)) ) {
             return new RuleResult($this, $priority, $needRoleName, $needResourceName);
         }
 
@@ -226,11 +227,24 @@ class Rule
     public function isAllowed($needRuleName, $needRoleName, $needResourceName)
     {
         if ( $this->getName() == $needRuleName ) {
-            $roles = new RecursiveIteratorIterator($this->getRole(), RecursiveIteratorIterator::SELF_FIRST);
-            $resources = new RecursiveIteratorIterator($this->getResource(), RecursiveIteratorIterator::SELF_FIRST);
+	        if ( ! is_null($this->getRole()) ) {
+                $roles = new RecursiveIteratorIterator($this->getRole(), RecursiveIteratorIterator::SELF_FIRST);
+	        } else {
+		        $roles = array(null);
+	        }
+
+	        if ( ! is_null($this->getResource()) ) {
+                $resources = new RecursiveIteratorIterator($this->getResource(), RecursiveIteratorIterator::SELF_FIRST);
+	        } else {
+		        $resources = array(null);
+	        }
+
             foreach ($roles as $role) {
                 foreach ($resources as $resource) {
-                    $depth = $roles->getDepth() + $resources->getDepth();
+	                $roleDepth = $role ? $roles->getDepth() : 0;
+	                $resourceDepth = $resource ? $resources->getDepth() : 0;
+
+                    $depth = $roleDepth + $resourceDepth;
                     $result = $this->match($role, $resource, $needRoleName, $needResourceName, -$depth);
 
                     if ( $result ) {
@@ -244,9 +258,9 @@ class Rule
     }
 
     /**
-     * @param Role $role
+     * @param Role|null $role
      */
-    public function setRole(Role $role)
+    public function setRole(Role $role = null)
     {
         $this->role = $role;
     }
@@ -260,9 +274,9 @@ class Rule
     }
 
     /**
-     * @param Resource $resource
+     * @param Resource|null $resource
      */
-    public function setResource(Resource $resource)
+    public function setResource(Resource $resource = null)
     {
         $this->resource = $resource;
     }

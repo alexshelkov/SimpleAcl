@@ -743,6 +743,133 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($acl->isAllowed('U', 'R', 'View'));
     }
 
+	public function testAddRuleOneArgument()
+	{
+		$acl = new Acl();
+
+		$rule = new Rule('View');
+
+		$acl->addRule($rule);
+
+		// only action determines is access allowd or not for rule with null role and resource
+		$this->assertFalse($acl->isAllowed('U', 'R', 'View'));
+
+		$rule->setAction(true);
+
+		// rule matched any role or resource as it have null for both
+		$this->assertTrue($acl->isAllowed('U', 'R', 'View'));
+
+		// nothing is change if only one argument use, action is not overwritten to null
+		$acl->addRule($rule);
+		$this->assertTrue($acl->isAllowed('U', 'R', 'View'));
+
+		// rule not matched if wrong rule name used
+		$this->assertFalse($acl->isAllowed('U', 'R', 'NotMatchedView'));
+
+		$u = new Role('U1');
+		$rule->setRole($u);
+
+		$r = new Resource('R1');
+		$rule->setResource($r);
+
+		$acl->addRule($rule);
+
+		$this->assertFalse($acl->isAllowed('U', 'R', 'View'));
+		// role and resource not overwritten
+		$this->assertTrue($acl->isAllowed('U1', 'R1', 'View'));
+		$this->assertSame($u, $rule->getRole());
+		$this->assertSame($r, $rule->getResource());
+	}
+
+	public function testAddRuleTowArguments()
+	{
+		$acl = new Acl();
+
+		$rule = new Rule('View');
+
+		$rule->setAction(false);
+
+		// rule overwrite action
+		$acl->addRule($rule, true);
+
+		// rule matched any role or resource as it have null for both
+		$this->assertTrue($acl->isAllowed('U', 'R', 'View'));
+
+		// rule not matched if wrong rule name used
+		$this->assertFalse($acl->isAllowed('U', 'R', 'NotMatchedView'));
+
+		$u = new Role('U1');
+		$rule->setRole($u);
+
+		$r = new Resource('R1');
+		$rule->setResource($r);
+
+		$acl->addRule($rule, true);
+
+		$this->assertFalse($acl->isAllowed('U', 'R', 'View'));
+		// role and resource not overwritten
+		$this->assertTrue($acl->isAllowed('U1', 'R1', 'View'));
+
+		$acl->addRule($rule, null);
+
+		$this->assertNull($rule->getAction());
+	}
+
+	public function testAddRuleThreeArguments()
+	{
+		$acl = new Acl();
+
+		$rule = new Rule('View');
+
+		$rule->setAction(false);
+
+		$u = new Role('U');
+		$r = new Resource('R');
+
+		$acl->addRule($u, $r, $rule);
+
+		$this->assertFalse($acl->isAllowed('U', 'R', 'View'));
+		$rule->setAction(true);
+		$this->assertTrue($acl->isAllowed('U', 'R', 'View'));
+
+		$u1 = new Role('U1');
+		$r1 = new Resource('R1');
+
+		// role and resource changed
+		$acl->addRule($u1, $r1, $rule);
+
+		$this->assertSame($u1, $rule->getRole());
+		$this->assertSame($r1, $rule->getResource());
+
+		$this->assertFalse($acl->isAllowed('U', 'R', 'View'));
+		$this->assertTrue($acl->isAllowed('U1', 'R1', 'View'));
+	}
+
+	public function testRuleOrResourceNull()
+	{
+		$acl = new Acl();
+
+		$rule = new Rule('View');
+
+		$rule->setAction(false);
+
+		$u = new Role('U');
+		$r = new Resource('R');
+
+		$acl->addRule(null, $r, $rule, true);
+
+		$this->assertTrue($acl->isAllowed('Any', 'R', 'View'));
+		$this->assertFalse($acl->isAllowed('Any', 'R1', 'View'));
+		$this->assertNull($rule->getRole());
+		$this->assertSame($r, $rule->getResource());
+
+		$acl->addRule($u, null, $rule, true);
+		$this->assertTrue($acl->isAllowed('U', 'Any', 'View'));
+		$this->assertFalse($acl->isAllowed('U1', 'Any', 'View'));
+		$this->assertNull($rule->getResource());
+		$this->assertSame($u, $rule->getRole());
+	}
+
     /**
      * Testing edge conditions.
      */

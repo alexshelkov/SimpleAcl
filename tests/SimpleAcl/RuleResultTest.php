@@ -31,5 +31,7 @@ class RuleResultTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame($roleAggregate, $result->getRoleAggregate());
         $this->assertSame($resourceAggregate, $result->getResourceAggregate());
+
+	    $this->assertNotEmpty($result->getId());
     }
 }

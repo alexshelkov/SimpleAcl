@@ -83,14 +83,53 @@ class Acl
      * Assign $role, $resource and $action to added rule.
      * If rule was already registered only change $role, $resource and $action for that rule.
      *
+     * This method accept 1, 2, 3 or 4 arguments:
+     *
+     * addRule($rule)
+     * addRule($rule, $action)
+     * addRule($role, $resource, $rule)
+     * addRule($role, $resource, $rule, $action)
+     *
      * @param Role $role
      * @param Resource $resource
      * @param Rule|string $rule
      * @param mixed $action
+     *
      * @throws InvalidArgumentException
      */
-    public function addRule(Role $role, Resource $resource, $rule, $action)
+    public function addRule()
     {
+	    $args = func_get_args();
+	    $argsCount = count($args);
+
+	    $role = null;
+	    $resource = null;
+	    $action = null;
+
+	    if ( $argsCount == 4 || $argsCount == 3 ) {
+		    $role = $args[0];
+		    $resource = $args[1];
+		    $rule = $args[2];
+		    if ( $argsCount == 4) {
+		        $action = $args[3];
+		    }
+	    } elseif( $argsCount == 2 ) {
+		    $rule = $args[0];
+		    $action = $args[1];
+	    } elseif ( $argsCount == 1 ) {
+		    $rule = $args[0];
+	    } else {
+		    throw new InvalidArgumentException(__METHOD__ . ' accepts only one, tow, three or four arguments');
+	    }
+
+	    if ( ! is_null($role) && ! $role instanceof Role ) {
+		    throw new InvalidArgumentException('Role must be an instance of SimpleAcl\Role or null');
+	    }
+
+	    if ( ! is_null($resource) && ! $resource instanceof Resource ) {
+		    throw new InvalidArgumentException('Resource must be an instance of SimpleAcl\Resource or null');
+	    }
+
         if ( is_string($rule) ) {
             $ruleClass = $this->getRuleClass();
             $rule = new $ruleClass($rule);
@@ -108,9 +147,14 @@ class Acl
             $this->rules[] = $rule;
         }
 
-        $rule->setRole($role);
-        $rule->setResource($resource);
-        $rule->setAction($action);
+	    if ( $argsCount == 3 || $argsCount == 4 ) {
+            $rule->setRole($role);
+            $rule->setResource($resource);
+	    }
+
+	    if ( $argsCount == 2 || $argsCount == 4 ) {
+            $rule->setAction($action);
+	    }
     }
 
     /**

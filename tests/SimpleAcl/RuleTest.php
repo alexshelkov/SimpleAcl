@@ -106,4 +106,25 @@ class RuleTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($isCalled);
     }
+
+	public function testNullRoleOrResource()
+	{
+		$rule = new Rule('Rule');
+
+		$this->assertNull($rule->isAllowed('NotMatchedRule', 'Role', 'Resource'));
+		$this->assertInstanceOf('SimpleAcl\RuleResult', $rule->isAllowed('Rule', 'Role', 'Resource'));
+
+		$rule = new Rule('Rule');
+		$rule->setRole(new Role('Role'));
+
+		$this->assertNull($rule->isAllowed('Rule', 'NotMatchedRole', 'Resource'));
+		$this->assertInstanceOf('SimpleAcl\RuleResult', $rule->isAllowed('Rule', 'Role', 'Resource'));
+
+		$rule = new Rule('Rule');
+		$rule->setResource(new Resource('Resource'));
+
+		$this->assertNull($rule->isAllowed('Rule', 'Role', 'NotMatchedResource'));
+		$this->assertInstanceOf('SimpleAcl\RuleResult', $rule->isAllowed('Rule', 'Role', 'Resource'));
+
+	}
 }
