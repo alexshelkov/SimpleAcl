@@ -62,9 +62,6 @@ $acl->addRule($view, true);
 
 // in that case action must be set before adding rule
 $acl->addRule($user, $siteBackend, $view);
-
-$acl->addRule($admin, $siteFrontend, 'View', true); // you can use string as rule
-$acl->addRule($admin, $siteBackend, 'View', true);
 ```
 
 ###### Roles and resource inheritance

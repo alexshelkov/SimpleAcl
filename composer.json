@@ -1,5 +1,6 @@
 {
     "name": "alexshelkov/simpleacl",
+    "license": "BSD-3-Clause",
     "type": "library",
     "description": "Simple Access Control List (ACL) for PHP.",
     "keywords": ["ACL", "authorization", "permission"],
