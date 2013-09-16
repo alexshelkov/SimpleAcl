@@ -885,6 +885,27 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($acl->isAllowed('U', 'R', 'View'));
 	}
 
+	public function testRuleApplyPriority()
+	{
+		$acl = new Acl();
+
+		$rule = new Rule('View');
+		$rule->setPriority(1);
+
+		$u = new Role('U');
+		$r = new Resource('R');
+
+		$acl->addRule($u, $r, $rule, false);
+
+		$acl->addRule($u, $r, 'View', true);
+
+		$this->assertFalse($acl->isAllowed('U', 'R', 'View'));
+
+		$rule->setPriority(0);
+
+		$this->assertTrue($acl->isAllowed('U', 'R', 'View'));
+	}
+
     /**
      * Testing edge conditions.
      */

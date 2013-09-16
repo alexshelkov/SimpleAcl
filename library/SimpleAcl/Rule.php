@@ -22,6 +22,13 @@ class Rule
      */
     protected $id;
 
+	/**
+	 * Rule priority affect the order the rule is applied.
+	 *
+	 * @var int
+	 */
+	protected $priority = 0;
+
     /**
      * Hold name of rule.
      *
@@ -299,4 +306,20 @@ class Rule
     {
         return $this->resource;
     }
+
+	/**
+	 * @param int $priority
+	 */
+	public function setPriority($priority)
+	{
+		$this->priority = $priority;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getPriority()
+	{
+		return $this->priority;
+	}
 }

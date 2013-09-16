@@ -7,10 +7,10 @@ class SplPriorityQueue extends Base
 {
     protected $queueOrder = 0;
 
-    public function insert($datum, $priority)
+    public function insert($datum, $priority, $rulePriority = 0)
     {
         if ( is_int($priority) ) {
-            $priority = array($priority, $this->queueOrder++);
+            $priority = array($priority, $rulePriority, $this->queueOrder++);
         }
         parent::insert($datum, $priority);
     }
