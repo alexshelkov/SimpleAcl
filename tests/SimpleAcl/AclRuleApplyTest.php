@@ -10,6 +10,7 @@ use SimpleAcl\Rule;
 use SimpleAcl\Role\RoleAggregate;
 use SimpleAcl\Resource\ResourceAggregate;
 use SimpleAcl\RuleResult;
+use SimpleAcl\RuleWide;
 
 class AclRuleApplyTest extends PHPUnit_Framework_TestCase
 {
@@ -868,6 +869,20 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($acl->isAllowed('U1', 'Any', 'View'));
 		$this->assertNull($rule->getResource());
 		$this->assertSame($u, $rule->getRole());
+	}
+
+	public function testRuleWide()
+	{
+		$acl = new Acl();
+
+		$rule = new RuleWide('RuleWide');
+
+		$u = new Role('U');
+		$r = new Resource('R');
+
+		$acl->addRule($u, $r, $rule, true);
+
+		$this->assertTrue($acl->isAllowed('U', 'R', 'View'));
 	}
 
     /**
