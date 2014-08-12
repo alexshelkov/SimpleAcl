@@ -165,7 +165,7 @@ class Acl
      */
     protected function getNames($object)
     {
-        if ( is_string($object) ) {
+        if ( is_string($object) || is_null($object) ) {
             return array($object);
         } elseif ( $object instanceof RoleAggregateInterface ) {
             return $object->getRolesNames();

@@ -883,7 +883,48 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
 		$acl->addRule($u, $r, $rule, true);
 
 		$this->assertTrue($acl->isAllowed('U', 'R', 'View'));
-	}
+        $this->assertTrue($acl->isAllowed('U', 'R', null));
+        $this->assertFalse($acl->isAllowed('NotExist', 'R', null));
+        $this->assertFalse($acl->isAllowed('U', 'NotExist', null));
+
+        // null role and resource
+        $acl = new Acl();
+
+        $acl->addRule(null, null, $rule, true);
+
+        $this->assertTrue($acl->isAllowed('U', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U', 'R', null));
+
+        $this->assertTrue($acl->isAllowed(null, null, null));
+        $acl->removeRuleById($rule->getId());
+        $this->assertFalse($acl->isAllowed(null, null, null));
+
+        // null resource
+        $acl = new Acl();
+
+        $u = new Role('U');
+
+        $acl->addRule($u, null, $rule, true);
+
+        $this->assertTrue($acl->isAllowed('U', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U', 'R', null));
+        $this->assertTrue($acl->isAllowed('U', null, 'View'));
+        $this->assertFalse($acl->isAllowed('NotExist', 'R', 'View'));
+        $this->assertFalse($acl->isAllowed(null, 'R', 'View'));
+
+        // null role
+        $acl = new Acl();
+
+        $r = new Resource('R');
+
+        $acl->addRule(null, $r, $rule, true);
+
+        $this->assertTrue($acl->isAllowed('U', 'R', 'View'));
+        $this->assertTrue($acl->isAllowed('U', 'R', null));
+        $this->assertTrue($acl->isAllowed(null, 'R', 'View'));
+        $this->assertFalse($acl->isAllowed('U', 'NotExist', 'View'));
+        $this->assertFalse($acl->isAllowed('U', null, 'View'));
+    }
 
 	public function testRuleApplyPriority()
 	{
