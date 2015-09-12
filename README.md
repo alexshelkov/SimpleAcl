@@ -4,6 +4,8 @@ Simple Access Control List (ACL) for PHP.
 _____________________________________________________________________________________________________________________
 #### Install
 ##### Using composer
+
+[![Join the chat at https://gitter.im/alexshelkov/SimpleAcl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/alexshelkov/SimpleAcl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Add following in your composer.json:
 ```json
 {
