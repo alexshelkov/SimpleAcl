@@ -1,3 +1,8 @@
+2.0.22
+    
+    - Add better random id function
+    - Add coveralls.io and test on PHP 5.6
+
 2.0.21
 
     - Fix issue with null in Acl isAllowed

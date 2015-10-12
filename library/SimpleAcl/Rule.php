@@ -130,11 +130,11 @@ class Rule
     /**
      * Creates an id for rule.
      *
-     * @return mixed
+     * @return string
      */
     protected function generateId()
     {
-        return uniqid();
+        return bin2hex(openssl_random_pseudo_bytes(10));
     }
 
     /**
