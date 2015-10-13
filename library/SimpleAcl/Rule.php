@@ -212,8 +212,8 @@ class Rule
      */
     protected function match(Role $role = null, Resource $resource = null, $needRoleName, $needResourceName, $priority)
     {
-        if ( (is_null($role) || ($role && $role->getName() == $needRoleName)) &&
-	        (is_null($resource) || ($resource && $resource->getName() == $needResourceName)) ) {
+        if ( (is_null($role) || ($role && $role->getName() === $needRoleName)) &&
+	        (is_null($resource) || ($resource && $resource->getName() === $needResourceName)) ) {
             return new RuleResult($this, $priority, $needRoleName, $needResourceName);
         }
 
@@ -228,7 +228,7 @@ class Rule
 	 */
 	protected function isRuleMatched($neeRuleName)
 	{
-		return $this->getName() == $neeRuleName;
+		return $this->getName() === $neeRuleName;
 	}
 
     /**

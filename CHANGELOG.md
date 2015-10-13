@@ -1,3 +1,8 @@
+2.0.23
+    
+    - Made all string equality check strict 
+    - Remove coveralls.io from dev dependencies to travis
+
 2.0.22
     
     - Add better random id function

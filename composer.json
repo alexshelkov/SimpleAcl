@@ -19,8 +19,5 @@
         "psr-0": {
             "SimpleAcl": "library/"
         }
-    },
-    "require-dev": {
-        "satooshi/php-coveralls": "dev-master"
     }
 }

@@ -69,7 +69,7 @@ class Acl
     {
         foreach ( $this->rules as $rule ) {
             $needRuleId = ($needRule instanceof Rule) ? $needRule->getId() : $needRule;
-            if ( $rule->getId() == $needRuleId ) {
+            if ( $rule->getId() === $needRuleId ) {
                 return $rule;
             }
         }
@@ -260,9 +260,9 @@ class Acl
         }
 
         foreach ( $this->rules as $ruleIndex => $rule ) {
-            if ( $ruleName === null || ($ruleName !== null && $ruleName == $rule->getName()) ) {
-                if ( $roleName === null || ($roleName !== null && $rule->getRole() && $rule->getRole()->getName() == $roleName) ) {
-                    if ( $resourceName === null || ($resourceName !== null && $rule->getResource() && $rule->getResource()->getName() == $resourceName) ) {
+            if ( $ruleName === null || ($ruleName !== null && $ruleName === $rule->getName()) ) {
+                if ( $roleName === null || ($roleName !== null && $rule->getRole() && $rule->getRole()->getName() === $roleName) ) {
+                    if ( $resourceName === null || ($resourceName !== null && $rule->getResource() && $rule->getResource()->getName() === $resourceName) ) {
                         unset($this->rules[$ruleIndex]);
                         if ( ! $all ) {
                             return;
@@ -281,7 +281,7 @@ class Acl
     public function removeRuleById($ruleId)
     {
         foreach ($this->rules as $ruleIndex => $rule) {
-            if ( $rule->getId() == $ruleId ) {
+            if ( $rule->getId() === $ruleId ) {
                 unset($this->rules[$ruleIndex]);
                 return;
             }

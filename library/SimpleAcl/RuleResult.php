@@ -55,7 +55,7 @@ class RuleResult
      */
     public function __construct(Rule $rule, $priority, $needRoleName, $needResourceName)
     {
-        $this->id = uniqid();
+        $this->id = bin2hex(openssl_random_pseudo_bytes(10));;
         $this->rule = $rule;
         $this->priority = $priority;
         $this->needRoleName = $needRoleName;

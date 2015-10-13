@@ -84,7 +84,7 @@ abstract class Object implements IteratorAggregate
         }
 
         foreach ($this->children as $childIndex => $child) {
-            if ( $child->getName() == $needChild ) {
+            if ( $child->getName() === $needChild ) {
                 unset($this->children[$childIndex]);
                 return true;
             }
@@ -107,7 +107,7 @@ abstract class Object implements IteratorAggregate
         }
 
         foreach ( $this->children as $child ) {
-            if ( $child->getName() == $childName ) {
+            if ( $child->getName() === $childName ) {
                 return $child;
             }
         }

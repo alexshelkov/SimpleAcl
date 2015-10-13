@@ -42,7 +42,7 @@ abstract class ObjectAggregate
         }
 
         foreach ($this->objects as $objectIndex => $object) {
-            if ( $object->getName() == $objectName ) {
+            if ( $object->getName() === $objectName ) {
                 unset($this->objects[$objectIndex]);
                 return true;
             }
@@ -82,7 +82,7 @@ abstract class ObjectAggregate
         }
 
         foreach ($this->objects as $object) {
-            if ( $object->getName() == $objectName ) {
+            if ( $object->getName() === $objectName ) {
                 return $object;
             }
         }
