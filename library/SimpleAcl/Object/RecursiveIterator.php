@@ -7,64 +7,70 @@ use SimpleAcl\Object;
 /**
  * Used to iterate by Roles and Resources hierarchy.
  *
+ * @package SimpleAcl\Object
  */
 class RecursiveIterator implements SplIterator
 {
-    /**
-     * @var Object
-     */
-    protected $objects = array();
+  /**
+   * @var Object[]
+   */
+  protected $objects = array();
 
-    public function current()
-    {
-        return current($this->objects);
+  /**
+   * @param $objects
+   */
+  public function __construct($objects)
+  {
+    $this->objects = $objects;
+  }
+
+  public function current()
+  {
+    return current($this->objects);
+  }
+
+  public function next()
+  {
+    return next($this->objects);
+  }
+
+  public function key()
+  {
+    if (null === key($this->objects)) {
+      return null;
     }
 
-    public function next()
-    {
-        return next($this->objects);
+    return $this->current()->getName();
+  }
+
+  public function valid()
+  {
+    return $this->key() !== null;
+  }
+
+  public function rewind()
+  {
+    return reset($this->objects);
+  }
+
+  public function hasChildren()
+  {
+    if (null === $this->key()) {
+      return false;
     }
 
-    public function key()
-    {
-        if ( is_null(key($this->objects)) ) {
-            return null;
-        }
+    $object = $this->current();
 
-        return $this->current()->getName();
-    }
+    return count($object->getChildren()) > 0;
+  }
 
-    public function valid()
-    {
-        return $this->key() !== null;
-    }
+  public function getChildren()
+  {
+    $object = $this->current();
+    $children = $object->getChildren();
 
-    public function rewind()
-    {
-        return reset($this->objects);
-    }
+    return new RecursiveIterator($children);
+  }
 
-    public function hasChildren()
-    {
-        if ( is_null($this->key()) ) {
-            return false;
-        }
 
-        $object = $this->current();
-
-        return count($object->getChildren()) > 0;
-    }
-
-    public function getChildren()
-    {
-        $object = $this->current();
-        $children = $object->getChildren();
-
-        return new RecursiveIterator($children);
-    }
-
-    public function __construct($objects)
-    {
-        $this->objects = $objects;
-    }
 }

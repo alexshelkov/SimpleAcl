@@ -1,19 +1,23 @@
 <?php
 namespace SimpleAcl;
 
-use SimpleAcl\Rule;
-
+/**
+ * Class RuleWide
+ *
+ * @package SimpleAcl
+ */
 class RuleWide extends Rule
 {
-	/**
-	 * Wide rule always works.
-	 *
-	 * @param $neeRuleName
-	 * @return bool
-	 */
-	protected function isRuleMatched($neeRuleName)
-	{
-		return true;
-	}
+  /**
+   * Wide rule always works.
+   *
+   * @param $neeRuleName
+   *
+   * @return bool
+   */
+  protected function isRuleMatched($neeRuleName)
+  {
+    return true;
+  }
 }
 
