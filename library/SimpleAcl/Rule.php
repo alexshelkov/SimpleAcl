@@ -142,7 +142,7 @@ class Rule
      */
     public function setId($id = null)
     {
-        if ( is_null($id) ) {
+        if ( null === $id ) {
             $id = $this->generateId();
         }
 
@@ -189,12 +189,12 @@ class Rule
     public function getAction(RuleResult $ruleResult = null)
     {
         $actionResult = $this->action;
-        if ( ! is_callable($actionResult) || is_null($ruleResult) ) {
-            return is_null($actionResult) ? $actionResult : (bool)$actionResult;
+        if ( ! is_callable($actionResult) || null === $ruleResult ) {
+            return null === $actionResult ? $actionResult : (bool)$actionResult;
         }
 
         $actionResult = call_user_func($this->action, $ruleResult);
-        $actionResult = is_null($actionResult) ? $actionResult : (bool)$actionResult;
+        $actionResult = null === $actionResult ? $actionResult : (bool)$actionResult;
 
         return $actionResult;
     }
@@ -212,8 +212,8 @@ class Rule
      */
     protected function match(Role $role = null, Resource $resource = null, $needRoleName, $needResourceName, $priority)
     {
-        if ( (is_null($role) || ($role && $role->getName() === $needRoleName)) &&
-            (is_null($resource) || ($resource && $resource->getName() === $needResourceName)) ) {
+        if ( (null === $role || ($role && $role->getName() === $needRoleName)) &&
+            (null === $resource || ($resource && $resource->getName() === $needResourceName)) ) {
             return new RuleResult($this, $priority, $needRoleName, $needResourceName);
         }
 
@@ -245,13 +245,13 @@ class Rule
     public function isAllowed($needRuleName, $needRoleName, $needResourceName)
     {
         if ( $this->isRuleMatched($needRuleName) ) {
-            if ( ! is_null($this->getRole()) ) {
+            if ( null !== $this->getRole() ) {
                 $roles = new RecursiveIteratorIterator($this->getRole(), RecursiveIteratorIterator::SELF_FIRST);
             } else {
                 $roles = array(null);
             }
 
-            if ( ! is_null($this->getResource()) ) {
+            if ( null !== $this->getResource() ) {
                 $resources = new RecursiveIteratorIterator($this->getResource(), RecursiveIteratorIterator::SELF_FIRST);
             } else {
                 $resources = array(null);

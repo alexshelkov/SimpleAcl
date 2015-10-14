@@ -122,11 +122,11 @@ class Acl
             throw new InvalidArgumentException(__METHOD__ . ' accepts only one, tow, three or four arguments');
         }
 
-        if ( ! is_null($role) && ! $role instanceof Role ) {
+        if ( null !== $role && ! $role instanceof Role ) {
             throw new InvalidArgumentException('Role must be an instance of SimpleAcl\Role or null');
         }
 
-        if ( ! is_null($resource) && ! $resource instanceof Resource ) {
+        if ( null !== $resource && ! $resource instanceof Resource ) {
             throw new InvalidArgumentException('Resource must be an instance of SimpleAcl\Resource or null');
         }
 
@@ -165,7 +165,7 @@ class Acl
      */
     protected function getNames($object)
     {
-        if ( is_string($object) || is_null($object) ) {
+        if ( is_string($object) || null === $object ) {
             return array($object);
         } elseif ( $object instanceof RoleAggregateInterface ) {
             return $object->getRolesNames();
@@ -254,7 +254,7 @@ class Acl
      */
     public function removeRule($roleName = null, $resourceName = null, $ruleName = null, $all = true)
     {
-        if ( is_null($roleName) && is_null($resourceName) && is_null($ruleName) ) {
+        if ( null === $roleName && null === $resourceName && null === $ruleName ) {
             $this->removeAllRules();
             return;
         }
