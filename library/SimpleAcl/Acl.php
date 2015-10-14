@@ -177,27 +177,6 @@ class Acl
     }
 
     /**
-     * Check is access allowed by some rule.
-     * Returns null if rule don't match any role or resource.
-     *
-     * @param string $roleName
-     * @param string $resourceName
-     * @param $ruleName
-     * @param RuleResultCollection $ruleResultCollection
-     * @param string|RoleAggregateInterface $roleAggregate
-     * @param string|ResourceAggregateInterface $resourceAggregate
-     */
-    protected function isRuleAllow($roleName, $resourceName, $ruleName, RuleResultCollection $ruleResultCollection, $roleAggregate, $resourceAggregate)
-    {
-        foreach ($this->rules as $rule) {
-            $rule->resetAggregate($roleAggregate, $resourceAggregate);
-
-            $result = $rule->isAllowed($ruleName, $roleName, $resourceName);
-            $ruleResultCollection->add($result);
-        }
-    }
-
-    /**
      * Checks is access allowed.
      *
      * @param string|RoleAggregateInterface $roleName
@@ -226,9 +205,53 @@ class Acl
         $roles = $this->getNames($roleAggregate);
         $resources = $this->getNames($resourceAggregate);
 
+        if (
+            (is_string($roleAggregate) && in_array($roleAggregate, $roles, true) === false)
+            ||
+            (is_string($resourceAggregate) && in_array($resourceAggregate, $resources, true) === false)
+        ) {
+            $ruleResultCollection->add(null);
+            return $ruleResultCollection;
+        }
+
         foreach ($roles as $roleName) {
+            if (
+                is_string($roleAggregate)
+                &&
+                !$roleName instanceof RoleAggregateInterface
+                &&
+                $roleName !== $roleAggregate
+            ) {
+                continue;
+            }
+
             foreach ($resources as $resourceName) {
-                $this->isRuleAllow($roleName, $resourceName, $ruleName, $ruleResultCollection, $roleAggregate, $resourceAggregate);
+                if (
+                    is_string($resourceAggregate)
+                    &&
+                    !$resourceName instanceof ResourceAggregateInterface
+                    &&
+                    $resourceName !== $resourceAggregate
+                ) {
+                    continue;
+                }
+
+                foreach ($this->rules as $rule) {
+                    if (
+                        is_string($ruleName)
+                        &&
+                        !$rule instanceof RuleWide
+                        &&
+                        $rule->getName() !== $ruleName
+                    ) {
+                        continue;
+                    }
+
+                    $rule->resetAggregate($roleAggregate, $resourceAggregate);
+                    $result = $rule->isAllowed($ruleName, $roleName, $resourceName);
+                    // Set null if rule don't match any role or resource.
+                    $ruleResultCollection->add($result);
+                }
             }
         }
 
