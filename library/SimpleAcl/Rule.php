@@ -189,11 +189,7 @@ class Rule
     public function getAction(RuleResult $ruleResult = null)
     {
         $actionResult = $this->action;
-        if (
-            !is_callable($actionResult)
-            ||
-            null === $ruleResult
-        ) {
+        if ( ! is_callable($actionResult) || null === $ruleResult) {
             if (null !== $actionResult) {
                 return (bool)$actionResult;
             } else {
@@ -279,14 +275,13 @@ class Rule
 
             foreach ($roles as $role) {
                 foreach ($resources as $resource) {
-
                     $roleDepth = $role ? $roles->getDepth() : 0;
                     $resourceDepth = $resource ? $resources->getDepth() : 0;
 
                     $depth = $roleDepth + $resourceDepth;
                     $result = $this->match($role, $resource, $needRoleName, $needResourceName, -$depth);
 
-                    if ($result) {
+                    if ( $result ) {
                         return $result;
                     }
                 }

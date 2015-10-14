@@ -90,10 +90,10 @@ class Acl
      * addRule($role, $resource, $rule)
      * addRule($role, $resource, $rule, $action)
      *
-     * @param Role        ...$role
-     * @param Resource    ...$resource
-     * @param Rule|string ...$rule
-     * @param mixed       ...$action
+     * @param Role $role
+     * @param Resource $resource
+     * @param Rule|string $rule
+     * @param mixed $action
      *
      * @throws InvalidArgumentException
      */
@@ -286,54 +286,21 @@ class Acl
      * @param null|string $roleName
      * @param null|string $resourceName
      * @param null|string $ruleName
-     * @param bool        $all
+     * @param bool $all
      */
     public function removeRule($roleName = null, $resourceName = null, $ruleName = null, $all = true)
     {
-        if (
-            null === $roleName
-            &&
-            null === $resourceName
-            &&
-            null === $ruleName
-        ) {
+        if (null === $roleName && null === $resourceName && null === $ruleName) {
             $this->removeAllRules();
-
             return;
         }
 
         foreach ($this->rules as $ruleIndex => $rule) {
-            if (
-                $ruleName === null
-                ||
-                (
-                    $ruleName !== null
-                    &&
-                    $ruleName === $rule->getName()
-                )
-            ) {
-                if (
-                    $roleName === null
-                    ||
-                    (
-                        $roleName !== null
-                        &&
-                        $rule->getRole() && $rule->getRole()->getName() === $roleName
-                    )
-                ) {
-                    if (
-                        $resourceName === null
-                        ||
-                        (
-                            $resourceName !== null
-                            &&
-                            $rule->getResource()
-                            &&
-                            $rule->getResource()->getName() === $resourceName
-                        )
-                    ) {
+            if ( $ruleName === null || ($ruleName !== null && $ruleName === $rule->getName()) ) {
+                if ( $roleName === null || ($roleName !== null && $rule->getRole() && $rule->getRole()->getName() === $roleName) ) {
+                    if ( $resourceName === null || ($resourceName !== null && $rule->getResource() && $rule->getResource()->getName() === $resourceName) ) {
                         unset($this->rules[$ruleIndex]);
-                        if (!$all) {
+                        if ( ! $all ) {
                             return;
                         }
                     }
