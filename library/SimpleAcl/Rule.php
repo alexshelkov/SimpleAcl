@@ -22,12 +22,12 @@ class Rule
      */
     protected $id;
 
-	/**
-	 * Rule priority affect the order the rule is applied.
-	 *
-	 * @var int
-	 */
-	protected $priority = 0;
+    /**
+     * Rule priority affect the order the rule is applied.
+     *
+     * @var int
+     */
+    protected $priority = 0;
 
     /**
      * Hold name of rule.
@@ -142,7 +142,7 @@ class Rule
      */
     public function setId($id = null)
     {
-        if ( null === $id ) {
+        if ( is_null($id) ) {
             $id = $this->generateId();
         }
 
@@ -189,19 +189,14 @@ class Rule
     public function getAction(RuleResult $ruleResult = null)
     {
         $actionResult = $this->action;
-        if ( ! is_callable($actionResult) || null === $ruleResult) {
-            if (null !== $actionResult) {
-                return (bool)$actionResult;
-            } else {
-                return null;
-            }
+        if ( ! is_callable($actionResult) || is_null($ruleResult) ) {
+            return is_null($actionResult) ? $actionResult : (bool)$actionResult;
         }
+
         $actionResult = call_user_func($this->action, $ruleResult);
-        if (null !== $actionResult) {
-            return (bool)$actionResult;
-        } else {
-            return null;
-        }
+        $actionResult = is_null($actionResult) ? $actionResult : (bool)$actionResult;
+
+        return $actionResult;
     }
 
     /**
@@ -217,34 +212,24 @@ class Rule
      */
     protected function match(Role $role = null, Resource $resource = null, $needRoleName, $needResourceName, $priority)
     {
-        if (
-            (
-                null === $role
-                ||
-                ($role && $role->getName() === $needRoleName)
-            )
-            &&
-            (
-                null === $resource
-                ||
-                ($resource && $resource->getName() === $needResourceName)
-            )
-        ) {
+        if ( (is_null($role) || ($role && $role->getName() === $needRoleName)) &&
+            (is_null($resource) || ($resource && $resource->getName() === $needResourceName)) ) {
             return new RuleResult($this, $priority, $needRoleName, $needResourceName);
         }
+
         return null;
     }
 
-	/**
-	 * Check if rule can be used.
-	 *
-	 * @param $neeRuleName
-	 * @return bool
-	 */
-	protected function isRuleMatched($neeRuleName)
-	{
-		return $this->getName() === $neeRuleName;
-	}
+    /**
+     * Check if rule can be used.
+     *
+     * @param $neeRuleName
+     * @return bool
+     */
+    protected function isRuleMatched($neeRuleName)
+    {
+        return $this->getName() === $neeRuleName;
+    }
 
     /**
      * Check owing Role & Resource (and their children) and match its with $roleName & $resourceName;
@@ -259,15 +244,14 @@ class Rule
      */
     public function isAllowed($needRuleName, $needRoleName, $needResourceName)
     {
-        if ($this->isRuleMatched($needRuleName)) {
-
-            if (null !== $this->getRole()) {
+        if ( $this->isRuleMatched($needRuleName) ) {
+            if ( ! is_null($this->getRole()) ) {
                 $roles = new RecursiveIteratorIterator($this->getRole(), RecursiveIteratorIterator::SELF_FIRST);
             } else {
                 $roles = array(null);
             }
 
-            if (null !== $this->getResource()) {
+            if ( ! is_null($this->getResource()) ) {
                 $resources = new RecursiveIteratorIterator($this->getResource(), RecursiveIteratorIterator::SELF_FIRST);
             } else {
                 $resources = array(null);
@@ -323,19 +307,19 @@ class Rule
         return $this->resource;
     }
 
-	/**
-	 * @param int $priority
-	 */
-	public function setPriority($priority)
-	{
-		$this->priority = $priority;
-	}
+    /**
+     * @param int $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getPriority()
-	{
-		return $this->priority;
-	}
+    /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
 }

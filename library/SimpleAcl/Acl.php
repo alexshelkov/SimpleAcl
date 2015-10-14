@@ -99,34 +99,34 @@ class Acl
      */
     public function addRule()
     {
-	    $args = func_get_args();
-	    $argsCount = count($args);
+        $args = func_get_args();
+        $argsCount = count($args);
 
-	    $role = null;
-	    $resource = null;
-	    $action = null;
+        $role = null;
+        $resource = null;
+        $action = null;
 
-	    if ( $argsCount == 4 || $argsCount == 3 ) {
-		    $role = $args[0];
-		    $resource = $args[1];
-		    $rule = $args[2];
-		    if ( $argsCount == 4) {
-		        $action = $args[3];
-		    }
-	    } elseif( $argsCount == 2 ) {
-		    $rule = $args[0];
-		    $action = $args[1];
-	    } elseif ( $argsCount == 1 ) {
-		    $rule = $args[0];
-	    } else {
-		    throw new InvalidArgumentException(__METHOD__ . ' accepts only one, tow, three or four arguments');
-	    }
+        if ( $argsCount == 4 || $argsCount == 3 ) {
+            $role = $args[0];
+            $resource = $args[1];
+            $rule = $args[2];
+            if ( $argsCount == 4) {
+                $action = $args[3];
+            }
+        } elseif( $argsCount == 2 ) {
+            $rule = $args[0];
+            $action = $args[1];
+        } elseif ( $argsCount == 1 ) {
+            $rule = $args[0];
+        } else {
+            throw new InvalidArgumentException(__METHOD__ . ' accepts only one, tow, three or four arguments');
+        }
 
-        if (null !== ($role) && !$role instanceof Role) {
+        if ( ! is_null($role) && ! $role instanceof Role ) {
             throw new InvalidArgumentException('Role must be an instance of SimpleAcl\Role or null');
         }
 
-        if (null !== ($resource) && !$resource instanceof Resource) {
+        if ( ! is_null($resource) && ! $resource instanceof Resource ) {
             throw new InvalidArgumentException('Resource must be an instance of SimpleAcl\Resource or null');
         }
 
@@ -147,14 +147,14 @@ class Acl
             $this->rules[] = $rule;
         }
 
-	    if ( $argsCount == 3 || $argsCount == 4 ) {
+        if ( $argsCount == 3 || $argsCount == 4 ) {
             $rule->setRole($role);
             $rule->setResource($resource);
-	    }
+        }
 
-	    if ( $argsCount == 2 || $argsCount == 4 ) {
+        if ( $argsCount == 2 || $argsCount == 4 ) {
             $rule->setAction($action);
-	    }
+        }
     }
 
     /**
@@ -165,7 +165,7 @@ class Acl
      */
     protected function getNames($object)
     {
-        if ( is_string($object) || null === $object ) {
+        if ( is_string($object) || is_null($object) ) {
             return array($object);
         } elseif ( $object instanceof RoleAggregateInterface ) {
             return $object->getRolesNames();
@@ -174,6 +174,27 @@ class Acl
         }
 
         return array();
+    }
+
+    /**
+     * Check is access allowed by some rule.
+     * Returns null if rule don't match any role or resource.
+     *
+     * @param string $roleName
+     * @param string $resourceName
+     * @param $ruleName
+     * @param RuleResultCollection $ruleResultCollection
+     * @param string|RoleAggregateInterface $roleAggregate
+     * @param string|ResourceAggregateInterface $resourceAggregate
+     */
+    protected function isRuleAllow($roleName, $resourceName, $ruleName, RuleResultCollection $ruleResultCollection, $roleAggregate, $resourceAggregate)
+    {
+        foreach ($this->rules as $rule) {
+            $rule->resetAggregate($roleAggregate, $resourceAggregate);
+
+            $result = $rule->isAllowed($ruleName, $roleName, $resourceName);
+            $ruleResultCollection->add($result);
+        }
     }
 
     /**
@@ -205,66 +226,9 @@ class Acl
         $roles = $this->getNames($roleAggregate);
         $resources = $this->getNames($resourceAggregate);
 
-        if (
-            (
-                is_string($roleAggregate)
-                &&
-                in_array($roleAggregate, $roles, true) === false
-            )
-            ||
-            (
-                is_string($resourceAggregate)
-                &&
-                in_array($resourceAggregate, $resources, true) === false
-            )
-        ) {
-            $ruleResultCollection->add(null);
-
-            return $ruleResultCollection;
-        }
-
         foreach ($roles as $roleName) {
-
-            if (
-                is_string($roleAggregate)
-                &&
-                !$roleName instanceof RoleAggregateInterface
-                &&
-                $roleName !== $roleAggregate
-            ) {
-                continue;
-            }
-
             foreach ($resources as $resourceName) {
-
-                if (
-                    is_string($resourceAggregate)
-                    &&
-                    !$resourceName instanceof ResourceAggregateInterface
-                    &&
-                    $resourceName !== $resourceAggregate
-                ) {
-                    continue;
-                }
-
-                foreach ($this->rules as $rule) {
-
-                    if (
-                        is_string($ruleName)
-                        &&
-                        !$rule instanceof RuleWide
-                        &&
-                        $rule->getName() !== $ruleName
-                    ) {
-                        continue;
-                    }
-
-                    $rule->resetAggregate($roleAggregate, $resourceAggregate);
-
-                    $result = $rule->isAllowed($ruleName, $roleName, $resourceName);
-                    // Set null if rule don't match any role or resource.
-                    $ruleResultCollection->add($result);
-                }
+                $this->isRuleAllow($roleName, $resourceName, $ruleName, $ruleResultCollection, $roleAggregate, $resourceAggregate);
             }
         }
 
@@ -290,12 +254,12 @@ class Acl
      */
     public function removeRule($roleName = null, $resourceName = null, $ruleName = null, $all = true)
     {
-        if (null === $roleName && null === $resourceName && null === $ruleName) {
+        if ( is_null($roleName) && is_null($resourceName) && is_null($ruleName) ) {
             $this->removeAllRules();
             return;
         }
 
-        foreach ($this->rules as $ruleIndex => $rule) {
+        foreach ( $this->rules as $ruleIndex => $rule ) {
             if ( $ruleName === null || ($ruleName !== null && $ruleName === $rule->getName()) ) {
                 if ( $roleName === null || ($roleName !== null && $rule->getRole() && $rule->getRole()->getName() === $roleName) ) {
                     if ( $resourceName === null || ($resourceName !== null && $rule->getResource() && $rule->getResource()->getName() === $resourceName) ) {
