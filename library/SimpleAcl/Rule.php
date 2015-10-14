@@ -22,12 +22,12 @@ class Rule
      */
     protected $id;
 
-	/**
-	 * Rule priority affect the order the rule is applied.
-	 *
-	 * @var int
-	 */
-	protected $priority = 0;
+  /**
+   * Rule priority affect the order the rule is applied.
+   *
+   * @var int
+   */
+  protected $priority = 0;
 
     /**
      * Hold name of rule.
@@ -213,23 +213,23 @@ class Rule
     protected function match(Role $role = null, Resource $resource = null, $needRoleName, $needResourceName, $priority)
     {
         if ( (is_null($role) || ($role && $role->getName() === $needRoleName)) &&
-	        (is_null($resource) || ($resource && $resource->getName() === $needResourceName)) ) {
+          (is_null($resource) || ($resource && $resource->getName() === $needResourceName)) ) {
             return new RuleResult($this, $priority, $needRoleName, $needResourceName);
         }
 
         return null;
     }
 
-	/**
-	 * Check if rule can be used.
-	 *
-	 * @param $neeRuleName
-	 * @return bool
-	 */
-	protected function isRuleMatched($neeRuleName)
-	{
-		return $this->getName() === $neeRuleName;
-	}
+  /**
+   * Check if rule can be used.
+   *
+   * @param $neeRuleName
+   * @return bool
+   */
+  protected function isRuleMatched($neeRuleName)
+  {
+    return $this->getName() === $neeRuleName;
+  }
 
     /**
      * Check owing Role & Resource (and their children) and match its with $roleName & $resourceName;
@@ -245,22 +245,22 @@ class Rule
     public function isAllowed($needRuleName, $needRoleName, $needResourceName)
     {
         if ( $this->isRuleMatched($needRuleName) ) {
-	        if ( ! is_null($this->getRole()) ) {
+          if ( ! is_null($this->getRole()) ) {
                 $roles = new RecursiveIteratorIterator($this->getRole(), RecursiveIteratorIterator::SELF_FIRST);
-	        } else {
-		        $roles = array(null);
-	        }
+          } else {
+            $roles = array(null);
+          }
 
-	        if ( ! is_null($this->getResource()) ) {
+          if ( ! is_null($this->getResource()) ) {
                 $resources = new RecursiveIteratorIterator($this->getResource(), RecursiveIteratorIterator::SELF_FIRST);
-	        } else {
-		        $resources = array(null);
-	        }
+          } else {
+            $resources = array(null);
+          }
 
             foreach ($roles as $role) {
                 foreach ($resources as $resource) {
-	                $roleDepth = $role ? $roles->getDepth() : 0;
-	                $resourceDepth = $resource ? $resources->getDepth() : 0;
+                  $roleDepth = $role ? $roles->getDepth() : 0;
+                  $resourceDepth = $resource ? $resources->getDepth() : 0;
 
                     $depth = $roleDepth + $resourceDepth;
                     $result = $this->match($role, $resource, $needRoleName, $needResourceName, -$depth);
@@ -307,19 +307,19 @@ class Rule
         return $this->resource;
     }
 
-	/**
-	 * @param int $priority
-	 */
-	public function setPriority($priority)
-	{
-		$this->priority = $priority;
-	}
+  /**
+   * @param int $priority
+   */
+  public function setPriority($priority)
+  {
+    $this->priority = $priority;
+  }
 
-	/**
-	 * @return int
-	 */
-	public function getPriority()
-	{
-		return $this->priority;
-	}
+  /**
+   * @return int
+   */
+  public function getPriority()
+  {
+    return $this->priority;
+  }
 }
