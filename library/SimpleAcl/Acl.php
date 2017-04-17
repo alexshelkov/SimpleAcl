@@ -123,11 +123,11 @@ class Acl
             throw new InvalidArgumentException(__METHOD__ . ' accepts only one, tow, three or four arguments');
         }
 
-        if ( ! is_null($role) && ! $role instanceof Role ) {
+        if ( null !== $role && ! $role instanceof Role ) {
             throw new InvalidArgumentException('Role must be an instance of SimpleAcl\Role or null');
         }
 
-        if ( ! is_null($resource) && ! $resource instanceof Resource ) {
+        if ( null !== $resource && ! $resource instanceof Resource ) {
             throw new InvalidArgumentException('Resource must be an instance of SimpleAcl\Resource or null');
         }
 
@@ -166,7 +166,7 @@ class Acl
      */
     protected function getNames($object)
     {
-        if ( is_string($object) || is_null($object) ) {
+        if ( is_string($object) || null === $object ) {
             return array($object);
         } elseif ( $object instanceof RoleAggregateInterface ) {
             return $object->getRolesNames();
@@ -175,27 +175,6 @@ class Acl
         }
 
         return array();
-    }
-
-    /**
-     * Check is access allowed by some rule.
-     * Returns null if rule don't match any role or resource.
-     *
-     * @param string $roleName
-     * @param string $resourceName
-     * @param $ruleName
-     * @param RuleResultCollection $ruleResultCollection
-     * @param string|RoleAggregateInterface $roleAggregate
-     * @param string|ResourceAggregateInterface $resourceAggregate
-     */
-    protected function isRuleAllow($roleName, $resourceName, $ruleName, RuleResultCollection $ruleResultCollection, $roleAggregate, $resourceAggregate)
-    {
-        foreach ($this->rules as $rule) {
-            $rule->resetAggregate($roleAggregate, $resourceAggregate);
-
-            $result = $rule->isAllowed($ruleName, $roleName, $resourceName);
-            $ruleResultCollection->add($result);
-        }
     }
 
     /**
@@ -227,9 +206,53 @@ class Acl
         $roles = $this->getNames($roleAggregate);
         $resources = $this->getNames($resourceAggregate);
 
+        if (
+            (is_string($roleAggregate) && in_array($roleAggregate, $roles, true) === false)
+            ||
+            (is_string($resourceAggregate) && in_array($resourceAggregate, $resources, true) === false)
+        ) {
+            $ruleResultCollection->add(null);
+            return $ruleResultCollection;
+        }
+
         foreach ($roles as $roleName) {
+            if (
+                is_string($roleAggregate)
+                &&
+                !$roleName instanceof RoleAggregateInterface
+                &&
+                $roleName !== $roleAggregate
+            ) {
+                continue;
+            }
+
             foreach ($resources as $resourceName) {
-                $this->isRuleAllow($roleName, $resourceName, $ruleName, $ruleResultCollection, $roleAggregate, $resourceAggregate);
+                if (
+                    is_string($resourceAggregate)
+                    &&
+                    !$resourceName instanceof ResourceAggregateInterface
+                    &&
+                    $resourceName !== $resourceAggregate
+                ) {
+                    continue;
+                }
+
+                foreach ($this->rules as $rule) {
+                    if (
+                        is_string($ruleName)
+                        &&
+                        !$rule instanceof RuleWide
+                        &&
+                        $rule->getName() !== $ruleName
+                    ) {
+                        continue;
+                    }
+
+                    $rule->resetAggregate($roleAggregate, $resourceAggregate);
+                    $result = $rule->isAllowed($ruleName, $roleName, $resourceName);
+                    // Set null if rule don't match any role or resource.
+                    $ruleResultCollection->add($result);
+                }
             }
         }
 
@@ -255,7 +278,7 @@ class Acl
      */
     public function removeRule($roleName = null, $resourceName = null, $ruleName = null, $all = true)
     {
-        if ( is_null($roleName) && is_null($resourceName) && is_null($ruleName) ) {
+        if ( null === $roleName && null === $resourceName && null === $ruleName ) {
             $this->removeAllRules();
             return;
         }

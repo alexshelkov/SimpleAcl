@@ -35,7 +35,7 @@ class RuleResultCollection implements IteratorAggregate
             return;
         }
 
-        if ( is_null($result->getAction()) ) {
+        if ( null === $result->getAction() ) {
             return;
         }
 

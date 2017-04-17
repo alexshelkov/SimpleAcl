@@ -27,7 +27,7 @@ class RecursiveIterator implements SplIterator
 
     public function key()
     {
-        if ( is_null(key($this->objects)) ) {
+        if ( null === key($this->objects) ) {
             return null;
         }
 
@@ -46,7 +46,7 @@ class RecursiveIterator implements SplIterator
 
     public function hasChildren()
     {
-        if ( is_null($this->key()) ) {
+        if ( null === $this->key() ) {
             return false;
         }
 
