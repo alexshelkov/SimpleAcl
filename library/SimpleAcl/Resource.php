@@ -4,6 +4,6 @@ namespace SimpleAcl;
 /**
  * Represent Resources in ACL.
  */
-class Resource extends Object
+class Resource extends BaseObject
 {
 }

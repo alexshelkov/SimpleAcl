@@ -1,11 +1,11 @@
 <?php
 namespace SimpleAcl;
 
-use SimpleAcl\Object;
+use SimpleAcl\BaseObject;
 
 /**
  * Represent Roles in ACL.
  */
-class Role extends Object
+class Role extends BaseObject
 {
 }

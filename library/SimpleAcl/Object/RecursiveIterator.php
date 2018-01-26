@@ -2,7 +2,7 @@
 namespace SimpleAcl\Object;
 
 use RecursiveIterator as SplIterator;
-use SimpleAcl\Object;
+use SimpleAcl\BaseObject;
 
 /**
  * Used to iterate by Roles and Resources hierarchy.
