@@ -1,3 +1,7 @@
+2.0.24
+    
+    - Rename Object to BaseObject (as Object is reserved keyword from PHP 7.2)
+
 2.0.23
     
     - Made all string equality check strict 
