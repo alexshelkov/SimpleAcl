@@ -3,14 +3,14 @@ namespace SimpleAclTest;
 
 use PHPUnit_Framework_TestCase;
 
-use SimpleAcl\Object;
+use SimpleAcl\BaseObject;
 
 class ObjectTest extends PHPUnit_Framework_TestCase
 {
     public function testName()
     {
         /** @var Object $object  */
-        $object = $this->getMockForAbstractClass('SimpleAcl\Object', array('TestName'));
+        $object = $this->getMockForAbstractClass('SimpleAcl\BaseObject', array('TestName'));
 
         $this->assertEquals($object->getName(), 'TestName');
         $object->setName('NewName');
@@ -20,9 +20,9 @@ class ObjectTest extends PHPUnit_Framework_TestCase
     public function testAddChild()
     {
         /** @var Object $parent */
-        $parent = $this->getMockForAbstractClass('SimpleAcl\Object', array('Parent'));
+        $parent = $this->getMockForAbstractClass('SimpleAcl\BaseObject', array('Parent'));
 
-        $child = $this->getMockForAbstractClass('SimpleAcl\Object', array('Child'));
+        $child = $this->getMockForAbstractClass('SimpleAcl\BaseObject', array('Child'));
 
         $parent->addChild($child);
 
@@ -34,9 +34,9 @@ class ObjectTest extends PHPUnit_Framework_TestCase
     public function testRemoveChild()
     {
         /** @var Object $parent */
-        $parent = $this->getMockForAbstractClass('SimpleAcl\Object', array('Parent'));
+        $parent = $this->getMockForAbstractClass('SimpleAcl\BaseObject', array('Parent'));
 
-        $child = $this->getMockForAbstractClass('SimpleAcl\Object', array('Child'));
+        $child = $this->getMockForAbstractClass('SimpleAcl\BaseObject', array('Child'));
 
         $this->assertFalse($parent->removeChild($child));
 
@@ -55,9 +55,9 @@ class ObjectTest extends PHPUnit_Framework_TestCase
     public function testAddSameChild()
     {
         /** @var Object $parent */
-        $parent = $this->getMockForAbstractClass('SimpleAcl\Object', array('Parent'));
+        $parent = $this->getMockForAbstractClass('SimpleAcl\BaseObject', array('Parent'));
 
-        $child = $this->getMockForAbstractClass('SimpleAcl\Object', array('Child'));
+        $child = $this->getMockForAbstractClass('SimpleAcl\BaseObject', array('Child'));
 
         $parent->addChild($child);
 
@@ -67,7 +67,7 @@ class ObjectTest extends PHPUnit_Framework_TestCase
         $parent->addChild($child);
         $this->assertEquals(1, count($parent->getChildren()));
 
-        $child2 = $this->getMockForAbstractClass('SimpleAcl\Object', array('Child'));
+        $child2 = $this->getMockForAbstractClass('SimpleAcl\BaseObject', array('Child'));
 
         $parent->addChild($child2);
 
@@ -81,12 +81,12 @@ class ObjectTest extends PHPUnit_Framework_TestCase
 
     public function testGetChildren()
     {
-        $parent = $this->getMockForAbstractClass('SimpleAcl\Object', array('TestName'));
+        $parent = $this->getMockForAbstractClass('SimpleAcl\BaseObject', array('TestName'));
 
-        $child1 = $this->getMockForAbstractClass('SimpleAcl\Object', array('TestNameChild1'));
+        $child1 = $this->getMockForAbstractClass('SimpleAcl\BaseObject', array('TestNameChild1'));
         $parent->addChild($child1);
 
-        $child2 = $this->getMockForAbstractClass('SimpleAcl\Object', array('TestNameChild2'));
+        $child2 = $this->getMockForAbstractClass('SimpleAcl\BaseObject', array('TestNameChild2'));
         $parent->addChild($child2);
 
         $this->assertSame(array($child1, $child2), $parent->getChildren());

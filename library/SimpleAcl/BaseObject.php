@@ -8,7 +8,7 @@ use SimpleAcl\Object\RecursiveIterator;
  * Use to keep shared function between Roles and Resources.
  *
  */
-abstract class Object implements IteratorAggregate
+abstract class BaseObject implements IteratorAggregate
 {
     /**
      * Hold the name of object.
@@ -62,7 +62,7 @@ abstract class Object implements IteratorAggregate
      *
      * @param Object $child
      */
-    public function addChild(Object $child)
+    public function addChild(BaseObject $child)
     {
         if ( $this->hasChild($child) ) {
             return;
@@ -79,7 +79,7 @@ abstract class Object implements IteratorAggregate
      */
     public function removeChild($needChild)
     {
-        if ( $needChild instanceof Object ) {
+        if ($needChild instanceof BaseObject ) {
             $needChild = $needChild->getName();
         }
 
@@ -102,7 +102,7 @@ abstract class Object implements IteratorAggregate
      */
     public function hasChild($childName)
     {
-        if ( $childName instanceof Object ) {
+        if ($childName instanceof BaseObject ) {
             $childName = $childName->getName();
         }
 

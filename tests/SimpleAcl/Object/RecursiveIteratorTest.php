@@ -3,7 +3,7 @@ namespace SimpleAclTest;
 
 use PHPUnit_Framework_TestCase;
 
-use SimpleAcl\Object;
+use SimpleAcl\BaseObject;
 use SimpleAcl\Object\RecursiveIterator;
 use RecursiveIteratorIterator;
 
@@ -16,7 +16,7 @@ class RecursiveIteratorTest extends PHPUnit_Framework_TestCase
      */
     protected function getObject($name)
     {
-        return $this->getMockForAbstractClass('SimpleAcl\Object', array($name));
+        return $this->getMockForAbstractClass('SimpleAcl\BaseObject', array($name));
     }
 
     public function testKey()
