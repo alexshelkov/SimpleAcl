@@ -1,6 +1,6 @@
 Simple Access Control List (ACL) for PHP.
 
-[![Build Status](https://travis-ci.org/alexshelkov/SimpleAcl.svg?branch=master)](https://travis-ci.org/alexshelkov/SimpleAcl)
+[![Test Status](https://github.com/alexshelkov/SimpleAcl/actions/workflows/test.yml/badge.svg)](https://github.com/alexshelkov/SimpleAcl/actions/workflows/test.yml)
 [![Coverage Status](https://coveralls.io/repos/alexshelkov/SimpleAcl/badge.svg?branch=master&service=github)](https://coveralls.io/github/alexshelkov/SimpleAcl?branch=master)
 _____________________________________________________________________________________________________________________
 #### Install

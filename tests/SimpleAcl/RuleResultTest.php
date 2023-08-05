@@ -10,8 +10,8 @@ class RuleResultTest extends PHPUnit_Framework_TestCase
 {
     public function testRuleResult()
     {
-        $roleAggregate = $this->getMock('SimpleAcl\Role\RoleAggregateInterface');
-        $resourceAggregate = $this->getMock('SimpleAcl\Resource\ResourceAggregateInterface');
+        $roleAggregate = $this->getMockBuilder('SimpleAcl\Role\RoleAggregateInterface')->getMock();
+        $resourceAggregate = $this->getMockBuilder('SimpleAcl\Resource\ResourceAggregateInterface')->getMock();
 
         $rule = new Rule('Test');
 

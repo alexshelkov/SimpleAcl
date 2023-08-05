@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+    branches:
+      - master
+      - develop
+    paths-ignore:
+      - '**/README.md'
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths-ignore:
+      - '**/README.md'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - php: 5.3
+            php-unit: 4
+            coveralls: 1
+            coveralls-run: coveralls
+          - php: 5.4
+            php-unit: 4
+            coveralls: 1
+            coveralls-run: coveralls
+          - php: 5.5
+            php-unit: 4
+            coveralls: 2
+            coveralls-run: php-coveralls
+          - php: 5.6
+            php-unit: 5
+            coveralls: 2
+            coveralls-run: php-coveralls
+          - php: 7.0
+            php-unit: 5
+            coveralls: 2
+            coveralls-run: php-coveralls
+          - php: 7.1
+            php-unit: 5
+            coveralls: 2
+            coveralls-run: php-coveralls
+          - php: 7.2
+            php-unit: 5
+            coveralls: 2
+            coveralls-run: php-coveralls
+          - php: 7.3
+            php-unit: 5
+            coveralls: 2
+            coveralls-run: php-coveralls
+
+    name: Tests PHP ${{ matrix.php }} PHPUnit ${{ matrix.php-unit }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP ${{ matrix.php }} PHPUnit ${{ matrix.php-unit }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer, phpunit:${{ matrix.php-unit }}
+
+      - run: composer install
+
+      - run: phpunit --coverage-clover tmp/clover.xml
+
+      - run: composer global require php-coveralls/php-coveralls:${{ matrix.coveralls }}.*
+
+      - name: Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_PARALLEL: true
+          COVERALLS_FLAG_NAME: php-${{ matrix.php }}-${{ matrix.php-unit }}
+        run: ${{ matrix.coveralls-run }} --coverage_clover=tmp/clover.xml -v
+
+  coveralls:
+    needs: tests
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
