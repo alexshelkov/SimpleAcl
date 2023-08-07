@@ -1,4 +1,6 @@
 <?php
+namespace SimpleAclStubs;
+
 use SimpleAcl\Rule;
 use SimpleAcl\Role;
 use SimpleAcl\Resource;

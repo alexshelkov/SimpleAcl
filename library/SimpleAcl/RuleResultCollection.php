@@ -21,6 +21,10 @@ class RuleResultCollection implements IteratorAggregate
         $this->collection = new SplPriorityQueue();
     }
 
+    /**
+     * @return SplPriorityQueue
+     */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return clone $this->collection;

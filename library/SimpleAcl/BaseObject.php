@@ -27,6 +27,7 @@ abstract class BaseObject implements IteratorAggregate
     /**
      * @return RecursiveIterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new RecursiveIterator(array($this));

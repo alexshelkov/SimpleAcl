@@ -1,13 +1,13 @@
 <?php
 namespace SimpleAclTest\Resource;
 
-use PHPUnit_Framework_TestCase;
+use SimpleAclTest\TestCase;
 
 use SimpleAcl\Resource;
 use SimpleAcl\Resource\ResourceAggregate;
 
 
-class ResourceAggregateTest extends PHPUnit_Framework_TestCase
+class ResourceAggregateTest extends TestCase
 {
     public function testSetAndGetResources()
     {

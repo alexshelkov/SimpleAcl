@@ -1,13 +1,13 @@
 <?php
 namespace SimpleAclTest\Role;
 
-use PHPUnit_Framework_TestCase;
+use SimpleAclTest\TestCase;
 
 use SimpleAcl\Role;
 use SimpleAcl\Role\RoleAggregate;
 
 
-class RoleAggregateTest extends PHPUnit_Framework_TestCase
+class RoleAggregateTest extends TestCase
 {
     public function testSetAndGetRoles()
     {

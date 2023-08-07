@@ -1,13 +1,13 @@
 <?php
 namespace SimpleAclTest;
 
-use PHPUnit_Framework_TestCase;
+use SimpleAclTest\TestCase;
 
 use SimpleAcl\BaseObject;
 use SimpleAcl\Object\RecursiveIterator;
 use RecursiveIteratorIterator;
 
-class RecursiveIteratorTest extends PHPUnit_Framework_TestCase
+class RecursiveIteratorTest extends TestCase
 {
     /**
      * @param $name

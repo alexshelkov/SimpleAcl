@@ -1,7 +1,7 @@
 <?php
 namespace SimpleAclTest;
 
-use PHPUnit_Framework_TestCase;
+use SimpleAclTest\TestCase;
 
 use SimpleAcl\Acl;
 use SimpleAcl\Role;
@@ -10,12 +10,13 @@ use SimpleAcl\Rule;
 use SimpleAcl\Role\RoleAggregate;
 use SimpleAcl\Resource\ResourceAggregate;
 
-class AclTest extends PHPUnit_Framework_TestCase
+class AclTest extends TestCase
 {
     public function testThrowsExceptionWhenBadRule()
     {
         $acl = new Acl;
         $this->setExpectedException('SimpleAcl\Exception\InvalidArgumentException', 'SimpleAcl\Rule or string');
+
         $acl->addRule(new Role('User'), new Resource('Page'), new \stdClass(), true);
     }
 

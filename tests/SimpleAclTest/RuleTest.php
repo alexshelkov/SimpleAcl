@@ -1,14 +1,14 @@
 <?php
 namespace SimpleAclTest;
 
-use PHPUnit_Framework_TestCase;
+use SimpleAclTest\TestCase;
 
 use SimpleAcl\Role;
 use SimpleAcl\Resource;
 use SimpleAcl\Rule;
 use SimpleAcl\RuleResult;
 
-class RuleTest extends PHPUnit_Framework_TestCase
+class RuleTest extends TestCase
 {
     public function testName()
     {

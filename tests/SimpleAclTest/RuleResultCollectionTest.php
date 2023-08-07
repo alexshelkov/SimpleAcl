@@ -1,13 +1,13 @@
 <?php
 namespace SimpleAclTest;
 
-use PHPUnit_Framework_TestCase;
+use SimpleAclTest\TestCase;
 
 use SimpleAcl\RuleResultCollection;
 use SimpleAcl\RuleResult;
 use SimpleAcl\Rule;
 
-class RuleResultCollectionTest extends PHPUnit_Framework_TestCase
+class RuleResultCollectionTest extends TestCase
 {
     public function testEmpty()
     {

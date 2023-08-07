@@ -55,6 +55,18 @@ jobs:
             php-unit: 5
             coveralls: 2
             coveralls-run: php-coveralls
+          - php: 8.0
+            php-unit: 9
+            coveralls: 2.6
+            coveralls-run: php-coveralls
+          - php: 8.1
+            php-unit: 9
+            coveralls: 2.6
+            coveralls-run: php-coveralls
+          - php: 8.2
+            php-unit: 9
+            coveralls: 2.6
+            coveralls-run: php-coveralls
 
     name: Tests PHP ${{ matrix.php }} PHPUnit ${{ matrix.php-unit }}
 

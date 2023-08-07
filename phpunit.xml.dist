@@ -8,12 +8,11 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         syntaxCheck="false"
          bootstrap="./tests/bootstrap.php"
 >
     <testsuites>
         <testsuite name="SimpleAcl Test Suite">
-            <directory>./tests/SimpleAcl/</directory>
+            <directory>./tests/SimpleAclTest/</directory>
         </testsuite>
     </testsuites>
 

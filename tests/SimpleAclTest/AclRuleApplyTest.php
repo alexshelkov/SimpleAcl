@@ -1,7 +1,7 @@
 <?php
 namespace SimpleAclTest;
 
-use PHPUnit_Framework_TestCase;
+use SimpleAclTest\TestCase;
 
 use SimpleAcl\Acl;
 use SimpleAcl\Role;
@@ -11,8 +11,11 @@ use SimpleAcl\Role\RoleAggregate;
 use SimpleAcl\Resource\ResourceAggregate;
 use SimpleAcl\RuleResult;
 use SimpleAcl\RuleWide;
+use SimpleAclStubs\MathAnyRoleAndActAsWide;
+use SimpleAclStubs\MathAnyResourceAndActAsWide;
+use SimpleAclStubs\MatchAnything;
 
-class AclRuleApplyTest extends PHPUnit_Framework_TestCase
+class AclRuleApplyTest extends TestCase
 {
     public function testEmpty()
     {
@@ -81,7 +84,7 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
 
     public function testMultipleRolesMultipleResourcesMultipleRules()
     {
-        $runChecks = function(PHPUnit_Framework_TestCase $phpUnit, Acl $acl, $allowed) {
+        $runChecks = function(TestCase $phpUnit, Acl $acl, $allowed) {
             // Checks for page
             $phpUnit->assertEquals($allowed, $acl->isAllowed('User', 'Page', 'View'));
             $phpUnit->assertEquals($allowed, $acl->isAllowed('User', 'Page', 'Edit'));
@@ -94,20 +97,20 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
             $phpUnit->assertEquals($allowed, $acl->isAllowed('Admin', 'Page', 'View'));
             $phpUnit->assertEquals($allowed, $acl->isAllowed('Admin', 'Page', 'Edit'));
             $phpUnit->assertEquals($allowed, $acl->isAllowed('Admin', 'Page', 'Remove'));
-    
+
             // Checks for blog
             $phpUnit->assertEquals($allowed, $acl->isAllowed('User', 'Blog', 'View'));
             $phpUnit->assertEquals($allowed, $acl->isAllowed('User', 'Blog', 'Edit'));
             $phpUnit->assertEquals($allowed, $acl->isAllowed('User', 'Blog', 'Remove'));
-    
+
             $phpUnit->assertEquals($allowed, $acl->isAllowed('Moderator', 'Blog', 'View'));
             $phpUnit->assertEquals($allowed, $acl->isAllowed('Moderator', 'Blog', 'Edit'));
             $phpUnit->assertEquals($allowed, $acl->isAllowed('Moderator', 'Blog', 'Remove'));
-    
+
             $phpUnit->assertEquals($allowed, $acl->isAllowed('Admin', 'Blog', 'View'));
             $phpUnit->assertEquals($allowed, $acl->isAllowed('Admin', 'Blog', 'Edit'));
             $phpUnit->assertEquals($allowed, $acl->isAllowed('Admin', 'Blog', 'Remove'));
-    
+
             // Checks for site
             $phpUnit->assertEquals($allowed, $acl->isAllowed('User', 'Site', 'View'));
             $phpUnit->assertEquals($allowed, $acl->isAllowed('User', 'Site', 'Edit'));
@@ -121,7 +124,7 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
             $phpUnit->assertEquals($allowed, $acl->isAllowed('Admin', 'Site', 'Edit'));
             $phpUnit->assertEquals($allowed, $acl->isAllowed('Admin', 'Site', 'Remove'));
         };
-        
+
         $acl = new Acl;
 
         $user = new Role('User');
@@ -1197,12 +1200,12 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
 
     public function testCustomRule()
     {
-        require_once __DIR__ . '/../Stubs/CustomRule.php';
+        require_once __DIR__ . '/../SimpleAclStubs/CustomRule.php';
 
         // must match any role and act as wide
         $acl = new Acl();
 
-        $rule = new \MathAnyRoleAndActAsWide('MathAnyRoleAndActAsWide');
+        $rule = new MathAnyRoleAndActAsWide('MathAnyRoleAndActAsWide');
 
         $u = new Role('U');
         $r = new Resource('R');
@@ -1217,7 +1220,7 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
         // must match any resource and act as wide
         $acl = new Acl();
 
-        $rule = new \MathAnyResourceAndActAsWide('MathAnyResourceAndActAsWide');
+        $rule = new MathAnyResourceAndActAsWide('MathAnyResourceAndActAsWide');
 
         $u = new Role('U');
         $r = new Resource('R');
@@ -1231,7 +1234,7 @@ class AclRuleApplyTest extends PHPUnit_Framework_TestCase
 
         // must match anything
         $acl = new Acl();
-        $rule = new \MatchAnything('MathAnything');
+        $rule = new MatchAnything('MathAnything');
 
         $u = new Role('U');
         $r = new Resource('R');
