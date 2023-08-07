@@ -9,12 +9,14 @@ on:
       - develop
     paths-ignore:
       - '**/README.md'
+      - '**/CHANGELOG.md'
   pull_request:
     branches:
       - master
       - develop
     paths-ignore:
       - '**/README.md'
+      - '**/CHANGELOG.md'
 
 jobs:
   tests:

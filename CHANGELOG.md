@@ -1,3 +1,9 @@
+2.0.25
+
+    - Fixed problems which cause warning for PHP 8.2
+    - Migrate tests from Travis to GitHub Actions
+    - Added tests for PHP 8.0, 8.1, 8.2
+
 2.0.24
     
     - Rename Object to BaseObject (as Object is reserved keyword from PHP 7.2)
